@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pylxd import Client
 import asyncio
 
-import responses
+import containers.responses as responses
 
 router = APIRouter()
 client = Client()

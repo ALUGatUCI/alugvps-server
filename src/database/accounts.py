@@ -3,6 +3,7 @@ from argon2 import PasswordHasher
 from typing import Optional
 import accounts.body
 import database.database as database
+import asyncio
 
 class Account(sqlmodel.SQLModel, table=True):
     id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
@@ -16,7 +17,7 @@ def create_account(account: accounts.body.AccountCreationBody):
 
     # Start by hashing the password
     ph = PasswordHasher()
-    hashed_password = ph.hash(account.password)
+    hashed_password = asyncio.to_thread(ph.hash, account.password) # Run in async thread to prevent block
 
     # Get the database session
     session = database.get_session()

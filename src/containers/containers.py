@@ -5,7 +5,10 @@ import asyncio
 import containers.responses as responses
 
 router = APIRouter()
-client = Client()
+try:
+    client = Client()
+except Exception as e:
+    raise RuntimeError(f"Failed to connect to LXC: {e}")
 
 @router.get("/list", response_model=responses.ListContainers)
 async def containers_list():

@@ -1,7 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 import uvicorn
+from fastapi.security import OAuth2PasswordRequestForm
+from typing import Annotated
+from accounts.accounts import login_to_account, router as accounts
 from containers import router as containers
-from accounts import router as accounts
 from database import database
 
 app = FastAPI()
@@ -10,8 +12,12 @@ app = FastAPI()
 def on_startup():
     database.create_db_and_tables()
 
-# app.include_router(containers, prefix="/containers")
+app.include_router(containers, prefix="/containers")
 app.include_router(accounts, prefix="/accounts")
+
+@app.post("/token")
+def login_with_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+    login_to_account(form_data)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

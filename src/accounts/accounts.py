@@ -1,14 +1,19 @@
 import string
 import fastapi
-from accounts.body import AccountCreationBody
-import database.accounts as account_db
+from fastapi import Depends
+
+from accounts.body import AccountLogin
+from fastapi.security import OAuth2PasswordRequestForm
+from database.accounts import Account, add_account_to_database, perform_login, Token
 import database.database as database
+import database.exceptions as db_exceptions
 import sqlmodel
+from typing import Annotated
 
 router = fastapi.APIRouter()
 
 @router.post("/create_account")
-def create_account(account: AccountCreationBody):
+async def create_account(account: AccountLogin):
     """Do the password creation logic"""
 
     # Start with validating the emails
@@ -16,9 +21,9 @@ def create_account(account: AccountCreationBody):
         raise fastapi.HTTPException(status_code=400, detail="Email address is not valid")
 
     # Get the database session
-    session = database.get_session()
+    session = database.session
 
-    statement = sqlmodel.select(account_db.Account.email)
+    statement = sqlmodel.select(Account.email)
     emails = session.exec(statement).all()
 
     if account.email in emails:
@@ -55,6 +60,15 @@ def create_account(account: AccountCreationBody):
             detail="Password must contain at least one punctuation"
         )
 
-    account_db.create_account(account)
+    await add_account_to_database(account)
 
     return fastapi.Response(status_code=201)
+
+def login_to_account(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+    """Do the login logic"""
+    try:
+        return perform_login(form_data.username, form_data.password)
+    except db_exceptions.AccountNotFoundError as e:
+        raise fastapi.HTTPException(status_code=401, detail=str(e))
+    except db_exceptions.InvalidPasswordError as e:
+        raise fastapi.HTTPException(status_code=401, detail=str(e))

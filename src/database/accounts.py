@@ -1,9 +1,13 @@
+from datetime import datetime, timedelta, timezone
+from pydantic import BaseModel
 import sqlmodel
-from argon2 import PasswordHasher
+import jwt
 from typing import Optional
+from security import SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES, password_hasher as ph, ALGORITHM
 import accounts.body
 import database.database as database
 import asyncio
+import database.exceptions as exceptions
 
 class Account(sqlmodel.SQLModel, table=True):
     id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
@@ -12,22 +16,61 @@ class Account(sqlmodel.SQLModel, table=True):
     confirmed: bool = sqlmodel.Field(default=False)
     banned: bool = sqlmodel.Field(default=False)
 
-def create_account(account: accounts.body.AccountCreationBody):
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+def create_access_token(data: dict, expires_delta: timedelta | None = None):
+    """Create an access token"""
+    to_encode = data.copy()
+    if expires_delta:
+        expires = datetime.now(timezone.utc) + expires_delta
+    else:
+        expires = datetime.now(timezone.utc) + timedelta(minutes=30)
+
+    to_encode.update({"exp": expires})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+    return encoded_jwt
+
+async def add_account_to_database(account: accounts.body.AccountLogin):
     """Create an account and add it to the database"""
 
     # Start by hashing the password
-    ph = PasswordHasher()
-    hashed_password = asyncio.to_thread(ph.hash, account.password) # Run in async thread to prevent block
+    hashed_password = await asyncio.to_thread(ph.hash, account.password) # Run in async thread to prevent block
 
     # Get the database session
-    session = database.get_session()
+    session = database.session
 
     # Create the account with the Account class
     new_account = Account(
         email = account.email,
         password = hashed_password,
+        confirmed = False,
+        banned = False
     )
 
     session.add(new_account)
     session.commit()
     session.refresh(new_account)
+
+def perform_login(email: str, password: str):
+    """Perform a login and return a token"""
+    session = database.session # Get the session
+
+    statement = sqlmodel.select(Account).where(email == Account.email) # See if an account with that email exists
+    result = session.exec(statement).first()
+
+    if result is None: # If it doesn't, raise an error
+        raise exceptions.AccountNotFoundError(email)
+
+    # If an account was found, we check the password matches
+    if ph.verify(password, result.password):
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            {"sub" : result.email}, expires_delta=access_token_expires
+        )
+    else:
+        raise exceptions.InvalidPasswordError()
+
+    return Token(access_token=access_token, token_type="bearer")

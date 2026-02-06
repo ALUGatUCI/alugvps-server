@@ -8,6 +8,6 @@ class ContainerStatus(BaseModel):
     success: bool
     status: str
 
-class ContainerStart(BaseModel):
+class ContainerAction(BaseModel):
     success: bool
     message: str

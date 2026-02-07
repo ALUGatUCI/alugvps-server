@@ -17,7 +17,7 @@ app.include_router(accounts, prefix="/accounts")
 
 @app.post("/token")
 def login_with_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
-    login_to_account(form_data)
+    return login_to_account(form_data.username, form_data.password)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

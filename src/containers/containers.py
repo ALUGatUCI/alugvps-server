@@ -1,8 +1,12 @@
 import fastapi
+import jwt
+from fastapi import Depends
+from jwt import InvalidTokenError
 from pylxd import Client
 from typing import Annotated
 import asyncio
-from security import oauth2_scheme
+import security
+from security import oauth2_scheme, SECRET_KEY, ALGORITHM
 
 import containers.responses as responses
 
@@ -13,37 +17,28 @@ try:
 except Exception as e:
     raise RuntimeError(f"Failed to connect to LXC: {e}")
 
-@router.get("/list", response_model=responses.ListContainers)
-async def containers_list():
-    """Get the list of containers in this server"""
-    try:
-        containers = await asyncio.to_thread(client.containers.all)
-
-        containers = [container.name for container in containers]
-    except:
-        return responses.ListContainers(success=False, containers=None)
-
-    return responses.ListContainers(success=True, containers=containers)
-
-
-@router.get("/status/{name}", response_model=responses.ContainerStatus)
-async def container_status(token: Annotated[str, fastapi.Depends(oauth2_scheme)], name: str):
+@router.get("/status", response_model=responses.ContainerStatus)
+async def container_status(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
     """Get the status of the current container"""
+    ucinetid = security.verify_credentials(token) # Verify the credentials (An exception will occur if not valid)
+
     # Get the list of containers
     containers = await asyncio.to_thread(client.containers.all)
 
     for container in containers:
-        if container.name == name:
+        if container.name == ucinetid:
             return responses.ContainerStatus(success=True, status=container.status)
 
     return responses.ContainerStatus(success=False, status=None)
 
-@router.put("/start/{name}", response_model=responses.ContainerStatus)
-async def container_start(token: Annotated[str, fastapi.Depends(oauth2_scheme)], name: str):
+@router.put("/start", response_model=responses.ContainerAction)
+async def container_start(token: Annotated[str, Depends(oauth2_scheme)]):
     """Start the named container"""
+    ucinetid = security.verify_credentials(token) # Verify the credentials (An exception will occur if not valid)
+
     containers = await asyncio.to_thread(client.containers.all)
     for container in containers:
-        if container.name == name:
+        if container.name == ucinetid:
             try:
                 await asyncio.to_thread(container.start)
                 return responses.ContainerAction(success=True, message="Sent start request")
@@ -52,30 +47,34 @@ async def container_start(token: Annotated[str, fastapi.Depends(oauth2_scheme)],
 
     return responses.ContainerAction(success=False, message="Server not found")
 
-@router.put("/stop/{name}", response_model=responses.ContainerStatus)
-async def container_stop(token: Annotated[str, fastapi.Depends(oauth2_scheme)], name: str):
+@router.put("/stop", response_model=responses.ContainerAction)
+async def container_stop(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
     """Stop the named container"""
+    ucinetid = security.verify_credentials(token) # Verify the credentials (An exception will occur if not valid)
+
     containers = await asyncio.to_thread(client.containers.all)
     for container in containers:
-        if container.name == name:
+        if container.name == ucinetid:
             try:
                 await asyncio.to_thread(container.stop)
-                return {"success": True, "status": container.status}
+                return responses.ContainerAction(success=True, message="Sent stop request")
             except:
-                return {"success": False, "status": None}
+                return responses.ContainerAction(success=False, message="Something went wrong")
 
-    return {"success": False, "status": None}
+    return responses.ContainerAction(success=False, message="Server not found")
 
-@router.put("/restart/{name}")
-async def container_restart(token: Annotated[str, fastapi.Depends(oauth2_scheme)], name: str):
+@router.put("/restart", response_model=responses.ContainerAction)
+async def container_restart(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
     """Restart the named container"""
+    ucinetid = security.verify_credentials(token) # Verify the credentials (An exception will occur if not valid)
+
     containers = await asyncio.to_thread(client.containers.all)
     for container in containers:
-        if container.name == name:
+        if container.name == ucinetid:
             try:
                 await asyncio.to_thread(container.restart)
-                return {"success": True, "status": container.status}
+                return responses.ContainerAction(success=True, message="Sent restart request")
             except:
-                return {"success": False, "status": None}
+                return responses.ContainerAction(success=False, message="Something went wrong")
 
-    return {"success": False, "status": None}
+    return responses.ContainerAction(success=False, message="Server not found")

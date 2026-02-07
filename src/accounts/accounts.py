@@ -64,10 +64,10 @@ async def create_account(account: AccountLogin):
 
     return fastapi.Response(status_code=201)
 
-def login_to_account(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+def login_to_account(username, password) -> str:
     """Do the login logic"""
     try:
-        return perform_login(form_data.username, form_data.password)
+        return perform_login(username, password)
     except db_exceptions.AccountNotFoundError as e:
         raise fastapi.HTTPException(status_code=401, detail=str(e))
     except db_exceptions.InvalidPasswordError as e:

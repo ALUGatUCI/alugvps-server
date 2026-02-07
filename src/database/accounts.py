@@ -20,7 +20,7 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
+def _create_access_token(data: dict, expires_delta: timedelta | None = None):
     """Create an access token"""
     to_encode = data.copy()
     if expires_delta:
@@ -67,7 +67,7 @@ def perform_login(email: str, password: str):
     # If an account was found, we check the password matches
     if ph.verify(password, result.password):
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token = create_access_token(
+        access_token = _create_access_token(
             {"sub" : result.email}, expires_delta=access_token_expires
         )
     else:

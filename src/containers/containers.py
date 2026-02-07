@@ -1,12 +1,9 @@
 import fastapi
-import jwt
 from fastapi import Depends
-from jwt import InvalidTokenError
 from pylxd import Client
 from typing import Annotated
 import asyncio
 import security
-from security import oauth2_scheme, SECRET_KEY, ALGORITHM
 
 import containers.responses as responses
 

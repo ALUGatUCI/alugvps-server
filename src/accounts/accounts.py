@@ -1,14 +1,10 @@
 import string
 import fastapi
-from fastapi import Depends
-
 from accounts.body import AccountLogin
-from fastapi.security import OAuth2PasswordRequestForm
 from database.accounts import Account, add_account_to_database, perform_login, Token
 import database.database as database
 import database.exceptions as db_exceptions
 import sqlmodel
-from typing import Annotated
 
 router = fastapi.APIRouter()
 

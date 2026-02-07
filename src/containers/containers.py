@@ -2,6 +2,7 @@ import fastapi
 from fastapi import Depends
 from pylxd import Client
 from typing import Annotated
+from security import oauth2_scheme
 import asyncio
 import security
 

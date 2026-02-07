@@ -15,14 +15,14 @@ app = FastAPI()
 def on_startup():
     database.create_db_and_tables()
 
-app.include_router(containers, prefix="/containers")
-app.include_router(accounts, prefix="/accounts")
-
 @app.post("/token")
 def login_with_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     return login_to_account(form_data.username, form_data.password)
 
 def _launch_app():
+    app.include_router(containers, prefix="/containers")
+    app.include_router(accounts, prefix="/accounts")
+
     uvicorn.run(app, host="0.0.0.0", port=configuration.config_file["port"])
 
 if __name__ == "__main__":

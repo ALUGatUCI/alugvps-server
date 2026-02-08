@@ -11,3 +11,7 @@ class ContainerStatus(BaseModel):
 class ContainerAction(BaseModel):
     success: bool
     message: str
+
+class PortsList(BaseModel):
+    success: bool
+    ports: list[tuple]

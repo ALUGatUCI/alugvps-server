@@ -1,16 +1,27 @@
 import string
 import fastapi
-from accounts.body import AccountLogin
+from database.models import AccountLogin
 from database.accounts import Account, add_account_to_database, perform_login, Token
 import database.database as database
 import database.exceptions as db_exceptions
+from configuration import configuration
 import sqlmodel
+from sqlmodel import select
+from sqlalchemy import func
 
 router = fastapi.APIRouter()
 
 @router.post("/create_account")
 async def create_account(account: AccountLogin):
     """Do the password creation logic"""
+
+    # Check if there is anymore space for accounts
+    if configuration.read_config_file("acc_limit") is not None:
+        statement = select(func.count()).select_from(Account)
+        result = database.session.execute(statement).one()[0]
+
+        if result >= configuration.read_config_file("acc_limit"):
+            raise fastapi.HTTPException(status_code=400, detail="Account limit on server reached")
 
     # Start with validating the emails
     if not account.email.endswith("@uci.edu"):

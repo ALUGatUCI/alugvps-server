@@ -3,10 +3,12 @@ import json
 import pathlib
 import subprocess
 
-config_file = None
-
 def create_config_file():
     """Guided process for creating the program configuration file"""
+
+    # Skip file creation if it already exists
+    if (pathlib.Path.home() / ".alugvps-server" / "config.json").exists():
+        return
 
     config = {
         "secret_key": None, # Secret key for jwt encoding (run openssl rand -hex 32)
@@ -111,10 +113,7 @@ def create_config_file():
 
     print("Successfully created the configuration file")
 
-def config_file_exists() -> bool:
-    return (pathlib.Path.home() / ".alugvps-server" / "config.json").exists()
-
-def load_config_file():
-    global config_file
-
+def read_config_file(key: str):
     config_file = json.load(open(pathlib.Path.home() / ".alugvps-server" / "config.json"))
+
+    return config_file[key]

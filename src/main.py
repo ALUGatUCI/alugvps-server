@@ -23,19 +23,11 @@ def _launch_app():
     app.include_router(containers, prefix="/containers")
     app.include_router(accounts, prefix="/accounts")
 
-    uvicorn.run(app, host="0.0.0.0", port=configuration.config_file["port"])
+    uvicorn.run(app, host="0.0.0.0", port=configuration.read_config_file("port"))
 
 if __name__ == "__main__":
-    # The program must run as root to run due to UFW
-    if os.getuid() != 0:
-        print("You must be running as root for this program to function")
-        sys.exit(1)
+    configuration.create_config_file() # Starts guided config creation if file doesn't exist
 
-    if not configuration.config_file_exists(): # Create the config file if it doesn't exist
-        configuration.create_config_file()
-
-    configuration.load_config_file() # Load the config file into memory
-
-    _launch_app()
+    _launch_app() # Main function
 
     sys.exit(0)

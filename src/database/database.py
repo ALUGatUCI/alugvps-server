@@ -1,6 +1,6 @@
 import sqlmodel
 
-engine = sqlmodel.create_engine('sqlite:///accounts.db', connect_args={'check_same_thread': False})
+engine = sqlmodel.create_engine('sqlite:///alugvps.db', connect_args={'check_same_thread': False})
 session = None
 
 def create_db_and_tables():

@@ -1,0 +1,24 @@
+from pydantic import BaseModel
+from typing import Optional
+import sqlmodel
+
+
+class AccountLogin(BaseModel):
+    email: str
+    password: str
+
+class BaseAccount(BaseModel):
+    email: str | None = None
+    disabled: bool | None = None
+
+class Account(sqlmodel.SQLModel, table=True):
+    id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
+    email: str = sqlmodel.Field(index=True, unique=True)
+    password: str
+    confirmed: bool = sqlmodel.Field(default=False)
+    banned: bool = sqlmodel.Field(default=False)
+
+class Container(sqlmodel.SQLModel, table=True):
+    id: int = sqlmodel.Field(foreign_key="account.id", default=None, primary_key=True, index=True)
+    ssh_port: int
+    forward_ports: list[int] = sqlmodel.Field(sa_column=sqlmodel.Column(sqlmodel.JSON))

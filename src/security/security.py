@@ -1,12 +1,12 @@
 from typing import Annotated
-
+from configuration import configuration
 import jwt
 from fastapi import HTTPException, status, Depends
 import fastapi.security as security
 from jwt import InvalidTokenError
 from pwdlib import PasswordHash
 
-SECRET_KEY = None
+SECRET_KEY = configuration.read_config_file("secret_key")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

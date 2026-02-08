@@ -2,19 +2,12 @@ from datetime import datetime, timedelta, timezone
 from pydantic import BaseModel
 import sqlmodel
 import jwt
-from typing import Optional
 from security import SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES, password_hasher as ph, ALGORITHM
-import accounts.body
+from database.models import AccountLogin, Account
 import database.database as database
-import asyncio
+import database.containers as containers
 import database.exceptions as exceptions
-
-class Account(sqlmodel.SQLModel, table=True):
-    id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
-    email: str = sqlmodel.Field(index=True, unique=True)
-    password: str
-    confirmed: bool = sqlmodel.Field(default=False)
-    banned: bool = sqlmodel.Field(default=False)
+import asyncio
 
 class Token(BaseModel):
     access_token: str
@@ -33,7 +26,7 @@ def _create_access_token(data: dict, expires_delta: timedelta | None = None):
 
     return encoded_jwt
 
-async def add_account_to_database(account: accounts.body.AccountLogin):
+async def add_account_to_database(account: AccountLogin):
     """Create an account and add it to the database"""
 
     # Start by hashing the password
@@ -53,6 +46,9 @@ async def add_account_to_database(account: accounts.body.AccountLogin):
     session.add(new_account)
     session.commit()
     session.refresh(new_account)
+
+    # Now create the associated container
+    await containers.create_new_container(new_account.id, account)
 
 def perform_login(email: str, password: str):
     """Perform a login and return a token"""

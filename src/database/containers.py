@@ -8,6 +8,8 @@ from database.models import Account, AccountLogin
 from database.models import Container
 from database import database
 from containers import client
+from security.shacrypt512 import shacrypt
+
 
 async def create_new_container(account_id: int, account: AccountLogin):
     """Creates a new container upon account creation"""

@@ -1,5 +1,4 @@
 import asyncio
-from security.shacrypt512 import shacrypt
 
 from sqlalchemy import func
 from sqlmodel import select

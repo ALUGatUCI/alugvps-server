@@ -7,7 +7,6 @@ from containers import router as containers
 from configuration import configuration
 from database import database
 import sys
-import os
 
 app = FastAPI()
 

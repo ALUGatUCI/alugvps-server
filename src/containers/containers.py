@@ -1,7 +1,4 @@
-from http.client import HTTPException, HTTPResponse
-
 import fastapi
-import pylxd
 from fastapi import Depends
 from pylxd import Client
 from typing import Annotated

@@ -1,6 +1,8 @@
 import string
 import fastapi
-from database.models import AccountLogin
+from fastapi import Depends
+
+from accounts.body import AccountCreation
 from database.accounts import Account, add_account_to_database, perform_login, Token
 import database.database as database
 import database.exceptions as db_exceptions
@@ -12,7 +14,7 @@ from sqlalchemy import func
 router = fastapi.APIRouter()
 
 @router.post("/create_account")
-async def create_account(account: AccountLogin):
+async def create_account(account: AccountCreation = Depends()):
     """Do the password creation logic"""
 
     # Check if there is anymore space for accounts

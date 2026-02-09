@@ -1,12 +1,12 @@
 from http.client import HTTPException, HTTPResponse
 
 import fastapi
+import pylxd
 from fastapi import Depends
 from pylxd import Client
 from typing import Annotated
 
 from sqlmodel import select
-from starlette import status
 
 from security import oauth2_scheme
 import database.database as database
@@ -23,6 +23,15 @@ try:
     client = Client()
 except Exception as e:
     raise RuntimeError(f"Failed to connect to LXC: {e}")
+
+def _get_forward_ports(container: client.containers):
+    used_ports = []
+
+    for device in container.devices.items():
+        if device[1]["type"] == "proxy" and device[0] != "ssh-forward":
+            used_ports.append(tuple(device))
+
+    return used_ports
 
 @router.get("/status", response_model=responses.ContainerStatus)
 async def container_status(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
@@ -110,6 +119,11 @@ async def add_port(token: Annotated[str, fastapi.Depends(oauth2_scheme)], new_fo
             if new_forward.listen not in container_data.forward_ports:
                 raise fastapi.HTTPException(status_code=400, detail="An invalid port was specified")
 
+            # Also validate that the port isn't already in use
+            for forward_port in _get_forward_ports(container):
+                if str(new_forward.listen) in forward_port[1]["listen"]:
+                    raise fastapi.HTTPException(status_code=400, detail="The port is already in use")
+
             new_port_map = {
                 "type": "proxy",
                 "listen": f"tcp:0.0.0.0:{new_forward.listen}", # Port on the HOST
@@ -151,10 +165,6 @@ async def get_used_port_list(token: Annotated[str, fastapi.Depends(oauth2_scheme
     containers = await asyncio.to_thread(client.containers.all)
     for container in containers:
         if container.name == ucinetid:
-            used_ports = []
-
-            for device in container.devices.items():
-                if device[1]["type"] == "proxy" and device[0] != "ssh-forward":
-                    used_ports.append(tuple(device))
+            used_ports = _get_forward_ports(container)
 
             return responses.PortsList(success=True, ports=used_ports)

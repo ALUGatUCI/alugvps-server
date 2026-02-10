@@ -40,8 +40,8 @@ async def create_new_container(account_id: int, account: AccountCreation):
         "type": "container",
         "ephemeral": False,
         "source": {
-            "type": "image",
-            "fingerprint": "ad33d28f277c" # Install Ubuntu 24.04
+            'type': 'image',
+            'fingerprint': configuration.read_config_file("fingerprint_image"),
         },
         "config": {
             "limits.cpu": f"{configuration.read_config_file("cpu_limit")}",

@@ -19,7 +19,8 @@ def _create_config_file():
         "acc_limit": None, # Limit the number of LXC container instances on this machine
         "cpu_limit": None, # Limit CPU resources for newly created containers
         "ram_limit": None, # Limit RAM resources for newly created containers
-        "disk_limit": None # Limit the amount of storage for newly created containers
+        "disk_limit": None, # Limit the amount of storage for newly created containers
+        'fingerprint_image': None # Fingerprint for the image used in the server
     }
 
     # Begin the guided setup process
@@ -107,6 +108,10 @@ def _create_config_file():
         except:
             print("Please enter a valid integer")
             continue
+
+    # Get the fingerprint for the container image
+    fingerprint = input("Enter the fingerprint for the image that will be used: ")
+    config["fingerprint_image"] = fingerprint
 
     if not config_dir.exists():
         os.mkdir(config_dir)

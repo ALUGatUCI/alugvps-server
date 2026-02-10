@@ -3,7 +3,7 @@ from pydantic import BaseModel
 import sqlmodel
 import jwt
 from security import SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES, password_hasher as ph, ALGORITHM
-from database.models import AccountLogin, Account
+from database.models import AccountCreation, Account
 import database.database as database
 import database.containers as containers
 import database.exceptions as exceptions
@@ -26,11 +26,11 @@ def _create_access_token(data: dict, expires_delta: timedelta | None = None):
 
     return encoded_jwt
 
-async def add_account_to_database(account: AccountLogin):
+async def add_account_to_database(account: AccountCreation):
     """Create an account and add it to the database"""
 
     # Start by hashing the password
-    hashed_password = await asyncio.to_thread(ph.hash, account.password) # Run in async thread to prevent block
+    hashed_password = await asyncio.to_thread(ph.hash, account.password.get_secret_value()) # Run in async thread to prevent block
 
     # Get the database session
     session = database.session

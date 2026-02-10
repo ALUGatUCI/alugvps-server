@@ -2,8 +2,8 @@ import string
 import fastapi
 from fastapi import Depends
 
-from accounts.body import AccountCreation
-from database.accounts import Account, add_account_to_database, perform_login, Token
+from database.accounts import Account, add_account_to_database, perform_login
+from database.models import AccountCreation
 import database.database as database
 import database.exceptions as db_exceptions
 from configuration import configuration
@@ -39,31 +39,31 @@ async def create_account(account: AccountCreation = Depends()):
         raise fastapi.HTTPException(status_code=400, detail="Email address already exists")
 
     # Now validate the password
-    if account.password.strip() == "":
+    if account.password.get_secret_value().strip() == "":
         raise fastapi.HTTPException(status_code=400, detail="Password is required")
 
     if len(account.password) < 8:
         raise fastapi.HTTPException(status_code=400, detail="Password is too short")
 
-    if not any(c.islower() for c in account.password):
+    if not any(c.islower() for c in account.password.get_secret_value()):
         raise fastapi.HTTPException(
             status_code=400,
             detail="Password must contain at least one lowercase character"
         )
 
-    if not any(c.isupper() for c in account.password):
+    if not any(c.isupper() for c in account.password.get_secret_value()):
         raise fastapi.HTTPException(
             status_code=400,
             detail="Password must contain at least one uppercase character"
         )
 
-    if not any(c.isdigit() for c in account.password):
+    if not any(c.isdigit() for c in account.password.get_secret_value()):
         raise fastapi.HTTPException(
             status_code=400,
             detail="Password must contain at least one digit"
         )
 
-    if not any(c in string.punctuation for c in account.password):
+    if not any(c in string.punctuation for c in account.password.get_secret_value()):
         raise fastapi.HTTPException(
             status_code=400,
             detail="Password must contain at least one punctuation"

@@ -4,14 +4,14 @@ from sqlalchemy import func
 from sqlmodel import select
 
 import configuration
-from database.models import Account, AccountLogin
+from database.models import Account, AccountCreation
 from database.models import Container
 from database import database
 from containers import client
 from security.shacrypt512 import shacrypt
 
 
-async def create_new_container(account_id: int, account: AccountLogin):
+async def create_new_container(account_id: int, account: AccountCreation):
     """Creates a new container upon account creation"""
 
     # Calculate the SSH port forwarding number
@@ -32,7 +32,7 @@ async def create_new_container(account_id: int, account: AccountLogin):
     session.refresh(new_container)
 
     ucinetid = account.email[:account.email.find("@")]
-    hashed_password = shacrypt(account.password.encode('utf-8'))
+    hashed_password = shacrypt(account.password.get_secret_value().encode('utf-8'))
 
     # Now create and start the actual container
     container_config = {
@@ -41,7 +41,7 @@ async def create_new_container(account_id: int, account: AccountLogin):
         "ephemeral": False,
         "source": {
             "type": "image",
-            "fingerprint": "ad33d28f277c",
+            "fingerprint": "ad33d28f277c" # Install Ubuntu 24.04
         },
         "config": {
             "limits.cpu": f"{configuration.read_config_file("cpu_limit")}",

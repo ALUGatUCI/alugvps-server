@@ -3,11 +3,14 @@ import json
 import pathlib
 import subprocess
 
-def create_config_file():
+def _create_config_file():
     """Guided process for creating the program configuration file"""
 
+    config_dir = pathlib.Path.home() / ".alugvps-server"
+    config_file = pathlib.Path.home() / ".alugvps-server" / "config.json"
+
     # Skip file creation if it already exists
-    if (pathlib.Path.home() / ".alugvps-server" / "config.json").exists():
+    if config_file.exists():
         return
 
     config = {
@@ -105,15 +108,17 @@ def create_config_file():
             print("Please enter a valid integer")
             continue
 
-    if not (pathlib.Path.home() / ".alugvps-server").exists():
-        os.mkdir(pathlib.Path.home() / ".alugvps-server")
+    if not config_dir.exists():
+        os.mkdir(config_dir)
 
-    with open(pathlib.Path.home() / ".alugvps-server" / "config.json", "w") as f: # Create the config file
+    with open(config_file, "w") as f: # Create the config file
         json.dump(config, f, indent=4)
 
     print("Successfully created the configuration file")
 
 def read_config_file(key: str):
+    _create_config_file()
+
     config_file = json.load(open(pathlib.Path.home() / ".alugvps-server" / "config.json"))
 
     return config_file[key]

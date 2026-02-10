@@ -25,8 +25,6 @@ def _launch_app():
     uvicorn.run(app, host="0.0.0.0", port=configuration.read_config_file("port"))
 
 if __name__ == "__main__":
-    configuration.create_config_file() # Starts guided config creation if file doesn't exist
-
     _launch_app() # Main function
 
     sys.exit(0)

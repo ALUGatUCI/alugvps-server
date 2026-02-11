@@ -1,14 +1,16 @@
 import string
 import fastapi
 from fastapi import Depends
-
+import asyncio
+from containers import client
+from database import Container
 from database.accounts import Account, add_account_to_database, perform_login
 from database.models import AccountCreation
 import database.database as database
 import database.exceptions as db_exceptions
 from configuration import configuration
 import sqlmodel
-from sqlmodel import select
+from sqlmodel import select, delete
 from sqlalchemy import func
 
 router = fastapi.APIRouter()
@@ -69,7 +71,36 @@ async def create_account(account: AccountCreation = Depends()):
             detail="Password must contain at least one punctuation"
         )
 
-    await add_account_to_database(account)
+    try:
+        await add_account_to_database(account)
+    except Exception as e:
+        # Do the cleanup work if necessary
+        acc_statement = select(Account).where(Account.email == account.email)
+        account_entry = session.execute(acc_statement).first()[0]
+
+        if account_entry is not None:
+            account_id = account_entry.id
+            rm_acc_statement = delete(Account).where(Account.id == account_id)
+            session.execute(rm_acc_statement)
+            session.commit()
+
+        con_statement = select(Container).where(Container.id == account_id)
+        con_entry = session.execute(con_statement).first()[0]
+
+        if con_entry is not None:
+            rm_con_statement = delete(Container).where(Container.id == account_id)
+            session.execute(rm_con_statement)
+            session.commit()
+
+        ucinetid = account.email[:account.email.find("@")]
+
+        for container in client.containers.all():
+            if container.name == ucinetid:
+                await asyncio.to_thread(container.stop, wait=True)
+                await asyncio.to_thread(container.delete, wait=True)
+
+        # Raise the API exception
+        raise fastapi.HTTPException(status_code=400, detail=str(e))
 
     return fastapi.Response(status_code=201)
 

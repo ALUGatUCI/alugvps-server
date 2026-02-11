@@ -7,7 +7,7 @@ import configuration
 from database.models import Account, AccountCreation
 from database.models import Container
 from database import database
-from containers import client
+from containers.core import client
 from security.shacrypt512 import shacrypt
 
 

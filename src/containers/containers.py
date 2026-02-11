@@ -1,6 +1,6 @@
 import fastapi
 from fastapi import Depends
-from core import client
+from containers.core import client
 from typing import Annotated
 
 from sqlmodel import select

@@ -1,6 +1,6 @@
 import fastapi
 from fastapi import Depends
-from pylxd import Client
+from core import client
 from typing import Annotated
 
 from sqlmodel import select
@@ -15,11 +15,6 @@ import security
 import containers.responses as responses
 
 router = fastapi.APIRouter()
-
-try:
-    client = Client()
-except Exception as e:
-    raise RuntimeError(f"Failed to connect to LXC: {e}")
 
 def _get_forward_ports(container: client.containers):
     used_ports = []

@@ -1,10 +1,16 @@
 from typing import Annotated
+
+from sqlmodel import select
+
 from configuration import configuration
 import jwt
 from fastapi import HTTPException, status, Depends
 import fastapi.security as security
 from jwt import InvalidTokenError
 from pwdlib import PasswordHash
+
+from database import database
+from database.models import Account
 
 SECRET_KEY = configuration.read_config_file("secret_key")
 ALGORITHM = "HS256"
@@ -33,3 +39,11 @@ def verify_credentials(token: Annotated[str, Depends(oauth2_scheme)]):
         raise credentials_exception
 
     return ucinetid
+
+def check_confirmation_status(ucinetid: str):
+    session = database.session
+
+    statement = select(Account).where(Account.email == f"{ucinetid}@uci.edu")
+    result = session.execute(statement).first()[0]
+
+    return result.confirmed

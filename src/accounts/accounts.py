@@ -1,8 +1,10 @@
 import string
+from http import HTTPStatus
+from typing import Annotated
+
 import fastapi
 from fastapi import Depends
-import asyncio
-from containers import client
+from database import containers
 from database import Container
 from database.accounts import Account, add_account_to_database, perform_login
 from database.models import AccountCreation
@@ -12,8 +14,34 @@ from configuration import configuration
 import sqlmodel
 from sqlmodel import select, delete
 from sqlalchemy import func
+from accounts.body import ConfirmationCode
+
+from security import oauth2_scheme, verify_credentials
 
 router = fastapi.APIRouter()
+
+@router.post("/confirm")
+async def confirm_account(token: Annotated[str, fastapi.Depends(oauth2_scheme)], inputted_code: ConfirmationCode = Depends()):
+    ucinetid = verify_credentials(token)
+
+    session = database.session
+
+    statement = sqlmodel.select(Account).where(Account.email == f"{ucinetid}@uci.edu")
+    result = session.execute(statement).first()[0]
+
+    if result is None:
+        raise fastapi.HTTPException(status_code=400, detail="Account not found")
+
+    if result.confirmation_code != inputted_code.code:
+        raise fastapi.HTTPException(status_code=400, detail="Incorrect confirmation code")
+
+    # Assuming all checks pass, changed their confirmed status and create container
+    result.confirmed = True
+    session.commit()
+
+    await containers.create_new_container(result.id, result)
+
+    return fastapi.Response(status_code=201)
 
 @router.post("/create_account")
 async def create_account(account: AccountCreation = Depends()):
@@ -92,15 +120,8 @@ async def create_account(account: AccountCreation = Depends()):
             session.execute(rm_con_statement)
             session.commit()
 
-        ucinetid = account.email[:account.email.find("@")]
-
-        for container in client.containers.all():
-            if container.name == ucinetid:
-                await asyncio.to_thread(container.stop, wait=True)
-                await asyncio.to_thread(container.delete, wait=True)
-
         # Raise the API exception
-        raise fastapi.HTTPException(status_code=400, detail=str(e))
+        raise fastapi.HTTPException(status_code=500, detail=str(e))
 
     return fastapi.Response(status_code=201)
 

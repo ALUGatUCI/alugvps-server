@@ -1,3 +1,4 @@
+import string
 from datetime import datetime, timedelta, timezone
 from pydantic import BaseModel
 import sqlmodel
@@ -8,10 +9,17 @@ import database.database as database
 import database.containers as containers
 import database.exceptions as exceptions
 import asyncio
+import random
 
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+def _generate_random_confirmation_code():
+    """Generate a random confirmation code"""
+
+    characters = string.ascii_letters + string.digits
+    return ''.join(random.choice(characters) for _ in range(10))
 
 def _create_access_token(data: dict, expires_delta: timedelta | None = None):
     """Create an access token"""
@@ -40,15 +48,13 @@ async def add_account_to_database(account: AccountCreation):
         email = account.email,
         password = hashed_password,
         confirmed = False,
-        banned = False
+        banned = False,
+        confirmation_code = _generate_random_confirmation_code()
     )
 
     session.add(new_account)
     session.commit()
     session.refresh(new_account)
-
-    # Now create the associated container
-    await containers.create_new_container(new_account.id, account)
 
 def perform_login(email: str, password: str):
     """Perform a login and return a token"""

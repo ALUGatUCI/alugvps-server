@@ -17,6 +17,7 @@ class Account(sqlmodel.SQLModel, table=True):
     password: str
     confirmed: bool = sqlmodel.Field(default=False)
     banned: bool = sqlmodel.Field(default=False)
+    confirmation_code: str = sqlmodel.Field(unique=True)
 
 class Container(sqlmodel.SQLModel, table=True):
     id: int = sqlmodel.Field(foreign_key="account.id", default=None, primary_key=True, index=True)

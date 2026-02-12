@@ -113,6 +113,29 @@ def _create_config_file():
     fingerprint = input("Enter the fingerprint for the image that will be used: ")
     config["fingerprint_image"] = fingerprint
 
+    # Get email to communicate with
+    email = input("Enter the email that will be used for communications: ")
+    config["email"] = email
+
+    # Get the email key to authenticate with
+    email_key = input("Enter the key that will be used to authetnicate with the email service: ")
+    config["email_key"] = email_key
+
+    smtp_host = input("Enter the address of the SMTP server: ")
+    config["smtp_host"] = smtp_host
+
+    while True:
+        try:
+            smtp_port = int(input("Enter the SMTP port number (IPv4): "))
+            if smtp_port < 0 or smtp_port > 65535:
+                print("Please enter a valid port")
+                continue
+
+            config["smtp_port"] = smtp_port
+            break
+        except:
+            print("Please enter a valid port")
+
     if not config_dir.exists():
         os.mkdir(config_dir)
 

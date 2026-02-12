@@ -6,7 +6,7 @@ import jwt
 from security import SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES, password_hasher as ph, ALGORITHM
 from database.models import AccountCreation, Account
 import database.database as database
-import database.containers as containers
+from communications import send_email
 import database.exceptions as exceptions
 import asyncio
 import random
@@ -56,11 +56,24 @@ async def add_account_to_database(account: AccountCreation):
     session.commit()
     session.refresh(new_account)
 
+    # Send a confirmation email
+
+    subject = "ALUG@UCI VPS Services Account Confirmation"
+    send_to = new_account.email
+    contents = (
+        f"Hello,\n"
+        "If you didn't sign up to use ALUG@UCI's VPS services, please ignore this email.\n"
+        "Otherwise, please enter this confirmation code to continue the account creation process.\n"
+        f"Code: {new_account.confirmation_code}"
+    )
+
+    await send_email(subject, send_to, contents)
+
 def perform_login(email: str, password: str):
     """Perform a login and return a token"""
     session = database.session # Get the session
 
-    statement = sqlmodel.select(Account).where(email == Account.email) # See if an account with that email exists
+    statement = sqlmodel.select(Account).where(email == Account.email) # See if an account with that communications exists
     result = session.exec(statement).first()
 
     if result is None: # If it doesn't, raise an error

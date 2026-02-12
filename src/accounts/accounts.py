@@ -1,5 +1,4 @@
 import string
-from http import HTTPStatus
 from typing import Annotated
 
 import fastapi
@@ -31,6 +30,9 @@ async def confirm_account(token: Annotated[str, fastapi.Depends(oauth2_scheme)],
 
     if result is None:
         raise fastapi.HTTPException(status_code=400, detail="Account not found")
+
+    if result.confirmed == True:
+        raise fastapi.HTTPException(status_code=400, detail="Account is already confirmed")
 
     if result.confirmation_code != inputted_code.code:
         raise fastapi.HTTPException(status_code=400, detail="Incorrect confirmation code")

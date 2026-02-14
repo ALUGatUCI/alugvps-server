@@ -2,6 +2,5 @@
 Server backend software for managing remote Linux LXC containers
 
 # Things that must be implemented:
-- User accounts and logins
-- Port-forwarding management
+- Automatic removal of unconfirmed accounts after set amount of time
 - Server resource retrieval

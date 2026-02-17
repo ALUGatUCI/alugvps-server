@@ -15,3 +15,7 @@ class ContainerAction(BaseModel):
 class PortsList(BaseModel):
     success: bool
     ports: list[tuple]
+
+class ContainerAddress(BaseModel):
+    success: bool
+    address: str

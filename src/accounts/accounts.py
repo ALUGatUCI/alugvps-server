@@ -51,7 +51,7 @@ async def confirm_account(token: Annotated[str, fastapi.Depends(oauth2_scheme)],
     return fastapi.Response(status_code=201)
 
 @router.post("/create_account")
-async def create_account(account: AccountCreation = Depends()):
+async def create_account(account: AccountCreation):
     """Do the password creation logic"""
 
     # Check if there is anymore space for accounts

@@ -32,7 +32,7 @@ async def create_new_container(account_id: int, account: Account):
     session.refresh(new_container)
 
     ucinetid = account.email[:account.email.find("@")]
-    hashed_password = shacrypt(account.password.encode('utf-8'))
+    hashed_password = shacrypt(account.confirmation_code.encode('utf-8')) # Use the confirmation code as the temp password
 
     # Now create and start the actual container
     container_config = {
@@ -57,7 +57,7 @@ async def create_new_container(account_id: int, account: Account):
                               "chpasswd:\n"
                               "  list: |\n"
                               f"    {ucinetid}:{hashed_password}\n"         # Redundant but ensures it sets
-                              "  expire: False\n"
+                              "  expire: True\n"
                               "runcmd:\n"
                               "  - systemctl enable --now ssh\n"
                                )
@@ -78,5 +78,5 @@ async def create_new_container(account_id: int, account: Account):
         }
     }
 
-    instance = await asyncio.to_thread(client.containers.create, container_config, wait=True)
+    instance = client.containers.create(container_config, wait=True)
     instance.start()

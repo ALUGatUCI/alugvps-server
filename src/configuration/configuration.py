@@ -108,10 +108,6 @@ def _create_config_file():
             print("Please enter a valid integer")
             continue
 
-    # Get the fingerprint for the container image
-    fingerprint = input("Enter the fingerprint for the image that will be used: ")
-    config["fingerprint_image"] = fingerprint
-
     # Get email to communicate with
     email = input("Enter the email that will be used for communications: ")
     config["email"] = email

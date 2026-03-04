@@ -1,5 +1,3 @@
-import socket
-
 import fastapi
 from fastapi import Depends
 from containers.core import client
@@ -28,15 +26,12 @@ def _get_forward_ports(container: client.containers):
     return used_ports
 
 @router.get("/address", response_model=responses.ContainerAddress)
-async def get_container_address(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
+async def get_container_connection_port(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
     """Get the address of the account's container"""
     ucinetid = security.verify_credentials(token) # Verify the credentials (An exception will occur if not valid)
 
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
-
-    # Get the host address
-    host_address = socket.gethostbyname(socket.gethostname())
 
     # Now get the assigned port of the container
     session = database.session
@@ -44,7 +39,7 @@ async def get_container_address(token: Annotated[str, fastapi.Depends(oauth2_sch
     statement = select(Container.ssh_port).where(Container.id == select(Account.id).where(f"{ucinetid}@uci.edu" == Account.email))
     result = session.exec(statement).first()
 
-    return responses.ContainerAddress(success=True, address=f"{host_address}:{result}")
+    return responses.ContainerAddress(success=True, address=f"{result}")
 
 
 @router.get("/status", response_model=responses.ContainerStatus)

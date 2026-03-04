@@ -20,7 +20,6 @@ def _create_config_file():
         "cpu_limit": None, # Limit CPU resources for newly created containers
         "ram_limit": None, # Limit RAM resources for newly created containers
         "disk_limit": None, # Limit the amount of storage for newly created containers
-        'fingerprint_image': None # Fingerprint for the image used in the server
     }
 
     # Begin the guided setup process

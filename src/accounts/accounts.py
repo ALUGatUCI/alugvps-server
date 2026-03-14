@@ -3,17 +3,16 @@ from typing import Annotated
 
 import fastapi
 from fastapi import Depends
-from database import containers
 from database import Container
 from database.accounts import Account, add_account_to_database, perform_login
-from database.models import AccountCreation
+from database.models import AccountCreation, Request
 import database.database as database
 import database.exceptions as db_exceptions
 from configuration import configuration
 import sqlmodel
 from sqlmodel import select, delete
 from sqlalchemy import func
-from accounts.body import ConfirmationCode
+from accounts.body import ConfirmationCode, ContainerRequest
 
 from security import oauth2_scheme, verify_credentials
 
@@ -43,6 +42,22 @@ async def confirm_account(token: Annotated[str, fastapi.Depends(oauth2_scheme)],
 
     return fastapi.Response(status_code=201)
 
+@router.post("/request_container")
+async def request_container(token: Annotated[str, fastapi.Depends(oauth2_scheme)], request: ContainerRequest):
+    ucinetid = verify_credentials(token)
+
+    session = database.session
+
+    # Validate the request is valid
+    if len(request.request_body.strip()) < 300:
+        raise fastapi.HTTPException(status_code=400, detail="A minimum of 300 characters is required")
+
+    acc_id = session.execute(select(Account.id).where(Account.email == f"{ucinetid}@uci.edu")).first()[0]
+    new_request = Request(id=acc_id, request=request.request_body)
+    session.add(new_request)
+    session.commit()
+
+    return fastapi.Response(status_code=201)
 
 @router.post("/create_account")
 async def create_account(account: AccountCreation):

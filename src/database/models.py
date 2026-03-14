@@ -11,7 +11,7 @@ class BaseAccount(BaseModel):
     email: str | None = None
     disabled: bool | None = None
 
-class Requests(sqlmodel.SQLModel, table=True):
+class Request(sqlmodel.SQLModel, table=True):
     id: int = sqlmodel.Field(foreign_key="account.id", default=None, primary_key=True, index=True)
     request: str = sqlmodel.Field(nullable=False)
 

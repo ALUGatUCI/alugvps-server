@@ -7,6 +7,7 @@ from containers import router as containers
 from configuration import configuration
 from database import database
 import sys
+import platform
 
 app = FastAPI()
 
@@ -25,6 +26,11 @@ def _launch_app():
     uvicorn.run(app, host="0.0.0.0", port=configuration.read_config_file("port"))
 
 if __name__ == "__main__":
+    # Do a platform check
+    if platform.system() != "Linux":
+        print("You must be running Linux for this software to function")
+        sys.exit(0)
+
     _launch_app() # Main function
 
     sys.exit(0)

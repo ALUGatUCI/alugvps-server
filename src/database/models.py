@@ -11,10 +11,14 @@ class BaseAccount(BaseModel):
     email: str | None = None
     disabled: bool | None = None
 
+class Requests(sqlmodel.SQLModel, table=True):
+    id: int = sqlmodel.Field(foreign_key="account.id", default=None, primary_key=True, index=True)
+    request: str = sqlmodel.Field(nullable=False)
+
 class Account(sqlmodel.SQLModel, table=True):
     id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
     email: str = sqlmodel.Field(index=True, unique=True)
-    password: str
+    password: str = sqlmodel.Field(nullable=False, default=None)
     confirmed: bool = sqlmodel.Field(default=False)
     banned: bool = sqlmodel.Field(default=False)
     confirmation_code: str = sqlmodel.Field(unique=True)

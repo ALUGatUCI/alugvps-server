@@ -41,14 +41,8 @@ async def confirm_account(token: Annotated[str, fastapi.Depends(oauth2_scheme)],
     result.confirmed = True
     session.commit()
 
-    # Try to create the container
-    try:
-        await containers.create_new_container(result.id, result)
-    except:
-        # If it already exists, let it be
-        pass
-
     return fastapi.Response(status_code=201)
+
 
 @router.post("/create_account")
 async def create_account(account: AccountCreation):

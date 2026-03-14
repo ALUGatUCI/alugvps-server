@@ -1,6 +1,8 @@
 import sqlmodel
+import pathlib
 
-engine = sqlmodel.create_engine('sqlite:///alugvps.db', connect_args={'check_same_thread': False})
+path = pathlib.Path.home() / ".alugvps-server" / "alugvps.db"
+engine = sqlmodel.create_engine(f"sqlite:///{path}", connect_args={'check_same_thread': False})
 session = None
 
 def create_db_and_tables():

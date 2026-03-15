@@ -87,5 +87,9 @@ def perform_login(email: str, password: str):
         )
     else:
         raise exceptions.InvalidPasswordError()
+    
+    # Check the account is not banned
+    if result.banned:
+        raise exceptions.AccountBannedError()
 
     return Token(access_token=access_token, token_type="bearer")

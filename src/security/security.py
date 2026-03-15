@@ -8,7 +8,6 @@ from fastapi import HTTPException, status, Depends
 import fastapi.security as security
 from jwt import InvalidTokenError
 from pwdlib import PasswordHash
-from database.database import session
 
 from database import database
 from database.models import Account
@@ -40,7 +39,7 @@ def verify_credentials(token: Annotated[str, Depends(oauth2_scheme)]):
         raise credentials_exception
 
     # Ensure the user isn't banned
-    if session.exec(select(Account.banned).where(Account.email == email)).first():
+    if database.session.exec(select(Account.banned).where(Account.email == email)).first():
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User is banned")
 
     return ucinetid

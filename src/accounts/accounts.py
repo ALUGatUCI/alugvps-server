@@ -160,3 +160,5 @@ def login_to_account(username, password) -> str:
         raise fastapi.HTTPException(status_code=401, detail=str(e))
     except db_exceptions.InvalidPasswordError as e:
         raise fastapi.HTTPException(status_code=401, detail=str(e))
+    except db_exceptions.AccountBannedError as e:
+        raise fastapi.HTTPException(status_code=403, detail=str(e))

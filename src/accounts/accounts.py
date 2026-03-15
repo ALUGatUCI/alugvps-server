@@ -13,6 +13,8 @@ import sqlmodel
 from sqlmodel import select, delete
 from sqlalchemy import func
 from accounts.body import ConfirmationCode, ContainerRequest
+from security import check_confirmation_status
+from containers.containers import get_container_by_ucinetid
 
 from security import oauth2_scheme, verify_credentials
 
@@ -45,6 +47,12 @@ async def confirm_account(token: Annotated[str, fastapi.Depends(oauth2_scheme)],
 @router.post("/request_container")
 async def request_container(token: Annotated[str, fastapi.Depends(oauth2_scheme)], request: ContainerRequest):
     ucinetid = verify_credentials(token)
+
+    if not check_confirmation_status(ucinetid):
+        raise fastapi.HTTPException(status_code=400, detail="Inactive user")
+    
+    if get_container_by_ucinetid(ucinetid) is None:
+        raise fastapi.HTTPException(status_code=400, detail="No container found for this account")
 
     session = database.session
 

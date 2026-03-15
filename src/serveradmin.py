@@ -39,7 +39,7 @@ if __name__ == "__main__":
             if request is not None:
                 # Create the container
                 try:
-                    create_new_container(request.id, request.request)
+                    create_new_container(request.id)
                 except Exception as e:
                     print(f"Error creating container: {e}")
                     sys.exit(1)

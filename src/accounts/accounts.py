@@ -48,11 +48,14 @@ async def request_container(token: Annotated[str, fastapi.Depends(oauth2_scheme)
 
     session = database.session
 
+    acc_id = session.exec(select(Account.id).where(Account.email == f"{ucinetid}@uci.edu")).first()
     # Validate the request is valid
+    if session.exec(select(Request.id).where(Request.id == acc_id)).first() is not None:
+        raise fastapi.HTTPException(status_code=400, detail="You already have a pending request")
+
     if len(request.request_body.strip()) < 300:
         raise fastapi.HTTPException(status_code=400, detail="A minimum of 300 characters is required")
 
-    acc_id = session.execute(select(Account.id).where(Account.email == f"{ucinetid}@uci.edu")).first()[0]
     new_request = Request(id=acc_id, request=request.request_body)
     session.add(new_request)
     session.commit()

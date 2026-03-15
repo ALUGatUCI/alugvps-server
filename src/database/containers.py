@@ -11,8 +11,13 @@ from containers.core import client
 from security.shacrypt512 import shacrypt
 
 
-async def create_new_container(account_id: int, account: Account):
+async def create_new_container(account_id: int):
     """Creates a new container upon account creation"""
+
+    # Get the account from the ID
+    account = session.exec(select(Account).where(Account.id == account_id)).one_or_none()
+    if account is None:
+        raise ValueError(f"No account found with ID {account_id}")
 
     # Calculate the SSH port forwarding number
     statement = select(func.count(Account.id))

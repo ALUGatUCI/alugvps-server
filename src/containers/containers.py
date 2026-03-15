@@ -16,6 +16,15 @@ import containers.responses as responses
 
 router = fastapi.APIRouter()
 
+async def get_container_by_ucinetid(ucinetid: str):
+    containers = await asyncio.to_thread(client.containers.all)
+
+    for container in containers:
+        if container.name == ucinetid:
+            return container
+
+    return None
+
 def _get_forward_ports(container: client.containers):
     used_ports = []
 
@@ -32,6 +41,9 @@ async def get_container_connection_port(token: Annotated[str, fastapi.Depends(oa
 
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
+    
+    if get_container_by_ucinetid(ucinetid) is None:
+        raise fastapi.HTTPException(status_code=400, detail="No container found for this account")
 
     # Now get the assigned port of the container
     session = database.session
@@ -50,6 +62,9 @@ async def container_status(token: Annotated[str, fastapi.Depends(oauth2_scheme)]
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
 
+    if get_container_by_ucinetid(ucinetid) is None:
+        raise fastapi.HTTPException(status_code=400, detail="No container found for this account")
+
     # Get the list of containers
     containers = await asyncio.to_thread(client.containers.all)
 
@@ -66,6 +81,9 @@ async def container_start(token: Annotated[str, Depends(oauth2_scheme)]):
 
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
+
+    if get_container_by_ucinetid(ucinetid) is None:
+        raise fastapi.HTTPException(status_code=400, detail="No container found for this account")
 
     containers = await asyncio.to_thread(client.containers.all)
     for container in containers:
@@ -85,6 +103,9 @@ async def container_stop(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
 
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
+    
+    if get_container_by_ucinetid(ucinetid) is None:
+        raise fastapi.HTTPException(status_code=400, detail="No container found for this account")
 
     containers = await asyncio.to_thread(client.containers.all)
     for container in containers:
@@ -105,6 +126,9 @@ async def container_restart(token: Annotated[str, fastapi.Depends(oauth2_scheme)
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
 
+    if get_container_by_ucinetid(ucinetid) is None:
+        raise fastapi.HTTPException(status_code=400, detail="No container found for this account")
+
     containers = await asyncio.to_thread(client.containers.all)
     for container in containers:
         if container.name == ucinetid:
@@ -124,6 +148,9 @@ async def add_port(token: Annotated[str, fastapi.Depends(oauth2_scheme)], new_fo
 
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
+    
+    if get_container_by_ucinetid(ucinetid) is None:
+        raise fastapi.HTTPException(status_code=400, detail="No container found for this account")
 
     containers = await asyncio.to_thread(client.containers.all)
     for container in containers:
@@ -167,6 +194,9 @@ async def remove_port(token: Annotated[str, fastapi.Depends(oauth2_scheme)], rem
 
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
+    
+    if get_container_by_ucinetid(ucinetid) is None:
+        raise fastapi.HTTPException(status_code=400, detail="No container found for this account")
 
     containers = await asyncio.to_thread(client.containers.all)
     for container in containers:
@@ -191,6 +221,9 @@ async def get_used_port_list(token: Annotated[str, fastapi.Depends(oauth2_scheme
 
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
+    
+    if get_container_by_ucinetid(ucinetid) is None:
+        raise fastapi.HTTPException(status_code=400, detail="No container found for this account")
 
     containers = await asyncio.to_thread(client.containers.all)
     for container in containers:

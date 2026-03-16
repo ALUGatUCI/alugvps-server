@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Annotated
@@ -9,6 +11,9 @@ from configuration import configuration
 from database import database
 import sys
 import platform
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app = FastAPI()
 
@@ -19,6 +24,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
+
+app.mount("/website", StaticFiles(directory=os.path.join(BASE_DIR, "website")), name="website")
+
 @app.on_event("startup")
 def on_startup():
     database.create_db_and_tables()
@@ -26,6 +34,11 @@ def on_startup():
 @app.post("/token")
 def login_with_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     return login_to_account(form_data.username, form_data.password)
+
+# Serve the main HTML page
+@app.get("/")
+async def read_index():
+    return FileResponse(os.path.join(BASE_DIR, "website", "index.html"))
 
 def _launch_app():
     app.include_router(containers, prefix="/containers")

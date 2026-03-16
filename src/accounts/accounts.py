@@ -3,6 +3,7 @@ from typing import Annotated
 
 import fastapi
 from fastapi import Depends
+from fastapi.security import OAuth2PasswordRequestForm
 from database import Container
 from database.accounts import Account, add_account_to_database, perform_login
 from database.models import AccountCreation, Request
@@ -71,7 +72,7 @@ async def request_container(token: Annotated[str, fastapi.Depends(oauth2_scheme)
     return fastapi.Response(status_code=201)
 
 @router.post("/create_account")
-async def create_account(account: AccountCreation):
+async def create_account(account: Annotated[OAuth2PasswordRequestForm, fastapi.Depends()]):
     """Do the password creation logic"""
 
     # Check if there is anymore space for accounts
@@ -83,7 +84,7 @@ async def create_account(account: AccountCreation):
             raise fastapi.HTTPException(status_code=400, detail="Account limit on server reached")
 
     # Start with validating the emails
-    if not account.email.endswith("@uci.edu"):
+    if not account.username.endswith("@uci.edu"):
         raise fastapi.HTTPException(status_code=400, detail="Email address is not valid")
 
     # Get the database session
@@ -92,35 +93,35 @@ async def create_account(account: AccountCreation):
     statement = sqlmodel.select(Account.email)
     emails = session.exec(statement).all()
 
-    if account.email in emails:
+    if account.username in emails:
         raise fastapi.HTTPException(status_code=400, detail="Email address already exists")
 
     # Now validate the password
-    if account.password.get_secret_value().strip() == "":
+    if account.password.strip() == "":
         raise fastapi.HTTPException(status_code=400, detail="Password is required")
 
     if len(account.password) < 8:
         raise fastapi.HTTPException(status_code=400, detail="Password is too short")
 
-    if not any(c.islower() for c in account.password.get_secret_value()):
+    if not any(c.islower() for c in account.password):
         raise fastapi.HTTPException(
             status_code=400,
             detail="Password must contain at least one lowercase character"
         )
 
-    if not any(c.isupper() for c in account.password.get_secret_value()):
+    if not any(c.isupper() for c in account.password):
         raise fastapi.HTTPException(
             status_code=400,
             detail="Password must contain at least one uppercase character"
         )
 
-    if not any(c.isdigit() for c in account.password.get_secret_value()):
+    if not any(c.isdigit() for c in account.password):
         raise fastapi.HTTPException(
             status_code=400,
             detail="Password must contain at least one digit"
         )
 
-    if not any(c in string.punctuation for c in account.password.get_secret_value()):
+    if not any(c in string.punctuation for c in account.password):
         raise fastapi.HTTPException(
             status_code=400,
             detail="Password must contain at least one punctuation"
@@ -130,21 +131,21 @@ async def create_account(account: AccountCreation):
         await add_account_to_database(account)
     except Exception as e:
         # Do the cleanup work if necessary
-        acc_statement = select(Account).where(Account.email == account.email)
-        account_entry = session.execute(acc_statement).first()[0]
+        acc_statement = select(Account).where(Account.email == account.username)
+        account_entry = session.exec(acc_statement).first()
 
         if account_entry is not None:
             account_id = account_entry.id
             rm_acc_statement = delete(Account).where(Account.id == account_id)
-            session.execute(rm_acc_statement)
+            session.exec(rm_acc_statement)
             session.commit()
 
         con_statement = select(Container).where(Container.id == account_id)
-        con_entry = session.execute(con_statement).first()[0]
+        con_entry = session.exec(con_statement).first()
 
         if con_entry is not None:
             rm_con_statement = delete(Container).where(Container.id == account_id)
-            session.execute(rm_con_statement)
+            session.exec(rm_con_statement)
             session.commit()
 
         # Raise the API exception

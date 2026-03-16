@@ -10,6 +10,9 @@ from communications import send_email
 import database.exceptions as exceptions
 import asyncio
 import random
+import fastapi
+from fastapi.security import OAuth2PasswordRequestForm
+from typing import Annotated
 
 class Token(BaseModel):
     access_token: str
@@ -34,18 +37,18 @@ def _create_access_token(data: dict, expires_delta: timedelta | None = None):
 
     return encoded_jwt
 
-async def add_account_to_database(account: AccountCreation):
+async def add_account_to_database(account: Annotated[OAuth2PasswordRequestForm, fastapi.Depends()]):
     """Create an account and add it to the database"""
 
     # Start by hashing the password
-    hashed_password = await asyncio.to_thread(ph.hash, account.password.get_secret_value()) # Run in async thread to prevent block
+    hashed_password = await asyncio.to_thread(ph.hash, account.password) # Run in async thread to prevent block
 
     # Get the database session
     session = database.session
 
     # Create the account with the Account class
     new_account = Account(
-        email = account.email,
+        email = account.username,
         password = hashed_password,
         confirmed = False,
         banned = False,

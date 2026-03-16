@@ -24,22 +24,13 @@ window.onload = function() {
     });
 }
 
-// Function to get public IP using a free service
-async function getPublicIp() {
-    const response = await fetch('https://api.ipify.org?format=json');
-    const data = await response.json();
-    return data.ip;
-}
-
 async function login() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
     try {
-        const ip = await getPublicIp();
-
         // Send the login request to the server
-        fetch(`http://147.135.115.199:8000/token`, {
+        fetch(`/token`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'

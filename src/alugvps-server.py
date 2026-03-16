@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Annotated
@@ -11,6 +12,13 @@ import platform
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 @app.on_event("startup")
 def on_startup():
     database.create_db_and_tables()

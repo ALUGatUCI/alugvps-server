@@ -18,14 +18,6 @@ arguments = sys.argv
 # Implement a simple CLI for managing requests and users
 if __name__ == "__main__":
     if len(arguments) == 3:
-        if arguments[1] == "delete": # Delete a request with the given ID
-            request = session.get(Request, int(arguments[2]))
-            if request is not None:
-                session.delete(request)
-                session.commit()
-                print(f"Deleted request with ID {arguments[2]}")
-            else:
-                print(f"No request found with ID {arguments[2]}")
         if arguments[1] == "view": # View a request with the given ID
             request = session.get(Request, int(arguments[2]))
             if request is not None:
@@ -74,5 +66,25 @@ if __name__ == "__main__":
                 print(f"Unbanned user with ID {arguments[2]}")
             else:
                 print(f"No user found with ID {arguments[2]}")
+    elif len(arguments) == 4:
+        if arguments[1] == "delete": # Delete a request or user with the given ID
+            if arguments[2] == "request":
+                request = session.get(Request, int(arguments[3]))
+                if request is not None:
+                    session.delete(request)
+                    session.commit()
+                    print(f"Deleted request with ID {arguments[3]}")
+                else:
+                    print(f"No request found with ID {arguments[3]}")
+            elif arguments[2] == "users":
+                user = session.get(Account, int(arguments[3]))
+                if user is not None:
+                    session.delete(user)
+                    session.commit()
+                    print(f"Deleted user with ID {arguments[3]}")
+                else:
+                    print(f"No user found with ID {arguments[3]}")
+            else:
+                print(f"Unknown delete type: {arguments[2]}")
     else:
         print("Implement help later")

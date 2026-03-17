@@ -1,5 +1,4 @@
 from fastapi import FastAPI, Depends
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 import uvicorn
@@ -16,14 +15,6 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"]
-)
 
 app.mount("/website", StaticFiles(directory=os.path.join(BASE_DIR, "website"), html=True), name="website")
 

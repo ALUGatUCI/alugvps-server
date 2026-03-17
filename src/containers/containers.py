@@ -11,6 +11,7 @@ from database.models import Container, Account
 from containers.body import AddPort, RemovePort
 import asyncio
 import security
+import httpx
 
 import containers.responses as responses
 
@@ -60,13 +61,24 @@ async def get_container_connection_port(token: Annotated[str, fastapi.Depends(oa
     if get_container_by_ucinetid(ucinetid) is None:
         raise fastapi.HTTPException(status_code=400, detail="No container found for this account")
 
+    # Get the public IP address of the server
+    with httpx.Client() as client:
+        try:
+            response = client.get("https://api.ipify.org?format=json")
+            response.raise_for_status()
+            public_ip = response.json()["ip"]
+        except httpx.RequestError as e:
+            raise fastapi.HTTPException(status_code=500, detail=f"Error retrieving public IP address: {e}")
+        except httpx.HTTPStatusError as e:
+            raise fastapi.HTTPException(status_code=500, detail=f"Error retrieving public IP address: {e}")
+
     # Now get the assigned port of the container
     session = database.session
     
     statement = select(Container.ssh_port).join(Account, Container.id == Account.id).where(Account.email == f"{ucinetid}@uci.edu")
     result = session.exec(statement).first()
 
-    return responses.ContainerAddress(success=True, address=f"{result}")
+    return responses.ContainerAddress(success=True, address=f"{public_ip}:{result}")
 
 
 @router.get("/status", response_model=responses.ContainerStatus)

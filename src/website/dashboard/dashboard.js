@@ -2,10 +2,36 @@ window.onload = function() {
     const startButton = document.getElementById('start').addEventListener('click', startVPS);
     const stopButton = document.getElementById('stop').addEventListener('click', stopVPS);
     const rebootButton = document.getElementById('reboot').addEventListener('click', rebootVPS);
-    const sshAddressSpan = document.getElementById('sshAddress');
     
+    // Fetch the SSH address on page load
+    setSSHAddress();
+
     setContainerStatus(); // Initial fetch of container status
     setInterval(setContainerStatus, 1500); // Update container status every 1.5 seconds
+}
+
+function setSSHAddress() {
+    const sshAddressSpan = document.getElementById('sshAddress');
+    // Fetch the SSH address on page load
+    fetch('/containers/address', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        }
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            sshAddressSpan.textContent = data.address;
+        } else {
+            sshAddressSpan.textContent = 'Unknown';
+        }
+    }).catch(error => {
+        console.error('Error fetching SSH address:', error);
+        sshAddressSpan.textContent = 'Unknown';
+    });
 }
 
 function setContainerStatus() {

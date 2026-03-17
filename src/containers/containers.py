@@ -77,7 +77,8 @@ async def container_status(token: Annotated[str, fastapi.Depends(oauth2_scheme)]
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
 
-    if get_container_by_ucinetid(ucinetid) is None:
+    container = await get_container_by_ucinetid(ucinetid)
+    if container is None:
         raise fastapi.HTTPException(status_code=400, detail="No container found for this account")
 
     # Get the list of containers

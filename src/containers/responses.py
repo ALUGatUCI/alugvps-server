@@ -19,3 +19,7 @@ class PortsList(BaseModel):
 class ContainerAddress(BaseModel):
     success: bool
     address: str
+
+class ContainerExists(BaseModel):
+    success: bool
+    exists: bool

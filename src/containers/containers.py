@@ -34,6 +34,21 @@ def _get_forward_ports(container: client.containers):
 
     return used_ports
 
+@router.get("/exists")
+async def check_container_exists(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
+    """Checks if a container exists for the account"""
+    ucinetid = security.verify_credentials(token) # Verify the credentials (An exception will occur if not valid)
+
+    if not security.check_confirmation_status(ucinetid):
+        raise fastapi.HTTPException(status_code=400, detail="Inactive user")
+
+    container = await get_container_by_ucinetid(ucinetid)
+
+    if container is None:
+        return responses.ContainerExists(success=True, exists=False)
+    else:
+        return responses.ContainerExists(success=True, exists=True)
+
 @router.get("/address", response_model=responses.ContainerAddress)
 async def get_container_connection_port(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
     """Get the address of the account's container"""

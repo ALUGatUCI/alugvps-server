@@ -35,6 +35,11 @@ def on_startup():
 def login_with_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     return login_to_account(form_data.username, form_data.password)
 
+# 404 error page
+@app.exception_handler(404)
+async def not_found(request, exc):
+    return RedirectResponse(url="/website/404.html")
+
 # Serve the main HTML page
 @app.get("/")
 async def read_index():

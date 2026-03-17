@@ -8,15 +8,21 @@ window.onload = function() {
             headers: {
                 'Authorization': `Bearer ${accessToken}`
             }
-        })
-        .then(response => function() {
-            if (response.status === 200) {
-                redirectToDashboard();
-            } else {
+        }).then(response => {
+            if (response.status === 401) {
                 localStorage.removeItem('access_token');
                 window.location.href = 'index.html';
             }
-        })
+        }).catch(error => {
+            console.error('Error verifying token:', error);
+            // If there's an error (e.g., token is invalid), redirect to login
+            localStorage.removeItem('access_token');
+            window.location.href = 'index.html';
+        }
+        )
+    } else {
+        // No token, redirect to login
+        window.location.href = 'index.html';
     }
 
     // Load the Ubuntu font from Google Fonts

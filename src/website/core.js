@@ -44,7 +44,11 @@ async function login() {
                 localStorage.setItem('access_token', data.access_token);
                 alert('Login successful!');
                 // Redirect to the dashboard or another page
-                window.location.href = 'dashboard.html';
+                if (fetch('/containers/exists').then(res => res.json()).then(existsData => existsData.exists)) {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    window.location.href = 'request.html';
+                }
             } else {
                 alert('Login failed: ' + (data.detail || 'Unknown error'));
             }

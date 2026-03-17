@@ -45,6 +45,16 @@ async def confirm_account(token: Annotated[str, fastapi.Depends(oauth2_scheme)],
 
     return fastapi.Response(status_code=201)
 
+@router.get("/verify_token")
+def verify_token(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
+    """Endpoint for the frontend to verify if a token is valid. Returns 200 if valid, 401 if not."""
+    try:
+        verify_credentials(token)
+    except:
+        raise fastapi.HTTPException(status_code=401, detail="Invalid token")
+    else:
+        return fastapi.Response(status_code=200)
+
 @router.post("/request_container")
 async def request_container(token: Annotated[str, fastapi.Depends(oauth2_scheme)], request: ContainerRequest):
     ucinetid = verify_credentials(token)

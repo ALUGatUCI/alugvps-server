@@ -1,4 +1,24 @@
 window.onload = function() {
+    // Automatically redirect to login if access token exists and is not valid
+    const accessToken = localStorage.getItem('access_token');
+    if (accessToken) {
+        // Check if the token is valid by making a request to a protected endpoint
+        fetch('/accounts/verify_token', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        })
+        .then(response => function() {
+            if (response.status === 200) {
+                redirectToDashboard();
+            } else {
+                localStorage.removeItem('access_token');
+                window.location.href = 'index.html';
+            }
+        })
+    }
+
     // Load the Ubuntu font from Google Fonts
     const preconnectAPI = document.createElement('link');
     preconnectAPI.rel = 'preconnect';

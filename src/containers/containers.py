@@ -62,8 +62,8 @@ async def get_container_connection_port(token: Annotated[str, fastapi.Depends(oa
 
     # Now get the assigned port of the container
     session = database.session
-
-    statement = select(Container.ssh_port).where(Container.id == select(Account.id).where(f"{ucinetid}@uci.edu" == Account.email))
+    
+    statement = select(Container.ssh_port).join(Account, Container.id == Account.id).where(Account.email == f"{ucinetid}@uci.edu")
     result = session.exec(statement).first()
 
     return responses.ContainerAddress(success=True, address=f"{result}")

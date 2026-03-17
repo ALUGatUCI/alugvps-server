@@ -1,7 +1,7 @@
 window.onload = function() {
     // Automatically redirect to login if access token exists and is not valid
     const accessToken = localStorage.getItem('access_token');
-    if (accessToken) {
+    if (accessToken && !window.location.href.endsWith('index.html')) {
         // Check if the token is valid by making a request to a protected endpoint
         fetch('/accounts/verify_token', {
             method: 'GET',

@@ -1,10 +1,26 @@
 window.onload = function() {
-    const accessToken = localStorage.getItem('access_token');
+    validateLogin();
 
+    const accessToken = localStorage.getItem('access_token');
     if (accessToken) {
-        // Check if the token is valid by making a request to a protected endpoint
-        redirectToDashboard()
-    }
+        // Check the token is still valid
+        fetch('/accounts/verify_token', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    }).then(response => {
+        if (response.status === 200) {
+            // Check if the token is valid by making a request to a protected endpoint
+            redirectToDashboard();
+        } else {
+            localStorage.removeItem('access_token');
+        }
+    }).catch(error => {
+        console.alert(`There was an error validating your token: ${error}`)
+        localStorage.removeItem('access_token');
+    })
+    };
     loginButton.addEventListener('click', async () => {
         await login();
     });

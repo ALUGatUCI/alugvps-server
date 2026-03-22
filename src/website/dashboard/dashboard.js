@@ -1,4 +1,6 @@
 window.onload = function() {
+    validateLogin();
+
     const startButton = document.getElementById('start').addEventListener('click', startVPS);
     const stopButton = document.getElementById('stop').addEventListener('click', stopVPS);
     const rebootButton = document.getElementById('reboot').addEventListener('click', rebootVPS);

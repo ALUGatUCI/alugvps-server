@@ -10,6 +10,9 @@ window.onload = function() {
 
     setContainerStatus(); // Initial fetch of container status
     setInterval(setContainerStatus, 1500); // Update container status every 1.5 seconds
+
+    // Set the port list
+    setPortList();
 }
 
 function setSSHAddress() {
@@ -128,4 +131,67 @@ function rebootVPS() {
         console.error('Error rebooting VPS:', error);
         alert('Failed to reboot VPS: ' + (error.message || 'Unknown error'));
     })
+}
+
+function setPortList() {
+    fetch('/containers/port/list', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        }
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            const portList = document.getElementById('ports_list');
+            data.ports.forEach(portEntry => {
+                createPortEntry(portList, portEntry)
+            });
+        }
+    })
+    .catch(error => {
+        console.error(`An error occurred fetching the ports: ${error}`)
+    })
+}
+
+function createPortEntry(portList, portEntry) {
+    // Create the element that will store port info
+    const entry = document.createElement('li');
+    const divElement = document.createElement('div');
+    divElement.className = "port-entry"
+
+    // Create port name entry
+    const entryName = document.createElement("h3");
+    entryName.textContent = portEntry[0];
+    divElement.appendChild(entryName);
+
+    // Create boxes for ports
+    const listenHeader = document.createElement('h4');
+    listenHeader.textContent = "Listen";
+    const listenTextbox = document.createElement('input');
+    listenTextbox.inputMode = 'text';
+    listenTextbox.value = getPortAddress(portEntry[1]['listen']);
+    divElement.appendChild(listenHeader);
+    divElement.appendChild(listenTextbox);
+
+    const connectHeader = document.createElement('h4');
+    connectHeader.textContent = "Connect";
+    const connectTextbox = document.createElement('input');
+    connectTextbox.inputMode = 'text';
+    connectTextbox.value = getPortAddress(portEntry[1]['connect']);
+    divElement.appendChild(connectHeader);
+    divElement.appendChild(connectTextbox);
+
+    // Add it to the port entry
+    entry.appendChild(divElement);
+    portList.appendChild(entry);
+}
+
+function getPortAddress(ipAddress) {
+    let port = ipAddress.substring(ipAddress.indexOf(':') + 1); // There's a first ':' after tcp, so we gotta find the second one
+    port = port.substring(port.indexOf(':') + 1); // We find the second one here
+    return port;
 }

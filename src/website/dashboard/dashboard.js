@@ -149,6 +149,7 @@ function setPortList() {
             const portList = document.getElementById('ports_list');
             data.ports.forEach(portEntry => {
                 createPortEntry(portList, portEntry)
+                portList.appendChild(document.createElement('br'));
             });
         }
     })
@@ -161,12 +162,14 @@ function createPortEntry(portList, portEntry) {
     // Create the element that will store port info
     const entry = document.createElement('li');
     const divElement = document.createElement('div');
-    divElement.className = "port-entry"
+    divElement.classList.add('port-entry');
 
     // Create port name entry
     const entryName = document.createElement("h3");
     entryName.textContent = portEntry[0];
     divElement.appendChild(entryName);
+
+    divElement.appendChild(document.createElement('br')); // Break the boxes and title apart
 
     // Create boxes for ports
     const listenHeader = document.createElement('h4');
@@ -176,6 +179,8 @@ function createPortEntry(portList, portEntry) {
     listenTextbox.value = getPortAddress(portEntry[1]['listen']);
     divElement.appendChild(listenHeader);
     divElement.appendChild(listenTextbox);
+
+    divElement.appendChild(document.createElement('br')); // Break the boxes apart
 
     const connectHeader = document.createElement('h4');
     connectHeader.textContent = "Connect";

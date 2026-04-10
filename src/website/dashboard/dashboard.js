@@ -146,9 +146,9 @@ function setPortList() {
     })
     .then(data => {
         if (data.success) {
-            const portList = document.getElementById('ports_list');
+            const portList = document.getElementById('ports-list');
             data.ports.forEach(portEntry => {
-                createPortEntry(portList, portEntry)
+                portList.appendChild(createPortEntry(portEntry));
                 portList.appendChild(document.createElement('br'));
             });
         }
@@ -158,7 +158,7 @@ function setPortList() {
     })
 }
 
-function createPortEntry(portList, portEntry) {
+function createPortEntry(portEntry) {
     // Create the element that will store port info
     const entry = document.createElement('li');
     const divElement = document.createElement('div');
@@ -174,11 +174,35 @@ function createPortEntry(portList, portEntry) {
     // Create boxes for ports
     const listenHeader = document.createElement('h4');
     listenHeader.textContent = "Listen";
-    const listenTextbox = document.createElement('input');
-    listenTextbox.inputMode = 'text';
-    listenTextbox.value = getPortAddress(portEntry[1]['listen']);
+    const listenDropdown = document.createElement('select');
+    listenDropdown.value = getPortAddress(portEntry[1]['listen']);
+
+    // Add options in the dropdown
+    fetch('/containers/port/valid_ports', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        }
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            data.ports.forEach(port => {
+                const option = document.createElement('option');
+                option.textContent = port;
+                listenDropdown.appendChild(option);
+            })
+        }
+    })
+    .catch(error => {
+        console.error(`Retrieval of valid ports failed: ${error}`);
+    })
+
     divElement.appendChild(listenHeader);
-    divElement.appendChild(listenTextbox);
+    divElement.appendChild(listenDropdown);
 
     divElement.appendChild(document.createElement('br')); // Break the boxes apart
 
@@ -192,7 +216,17 @@ function createPortEntry(portList, portEntry) {
 
     // Add it to the port entry
     entry.appendChild(divElement);
-    portList.appendChild(entry);
+
+    // Create Buttons for managing the port
+    const saveButton = document.createElement('button');
+    saveButton.textContent = "Save";
+    entry.appendChild(saveButton);
+
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = "Delete";
+    entry.appendChild(deleteButton);
+    
+    return entry;
 }
 
 function getPortAddress(ipAddress) {

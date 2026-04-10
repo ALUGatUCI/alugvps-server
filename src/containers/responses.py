@@ -16,6 +16,10 @@ class PortsList(BaseModel):
     success: bool
     ports: list[tuple]
 
+class ValidPorts(BaseModel):
+    success: bool
+    ports: list[int]
+
 class ContainerAddress(BaseModel):
     success: bool
     address: str

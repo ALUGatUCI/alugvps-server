@@ -210,9 +210,10 @@ async def add_port(token: Annotated[str, fastapi.Depends(oauth2_scheme)], new_fo
                 "connect": f"tcp:127.0.0.1:{new_forward.connect}"  # Port inside the CONTAINER
             }
 
-            container.devices[new_forward.name] = new_port_map
-
-            container.save()
+            # Prevent the user from overiding the CRITICAL devices
+            if new_forward.name != "ssh-port" and new_forward.name != "root":
+                container.devices[new_forward.name] = new_port_map
+                container.save()
 
         return responses.ContainerAction(success=True, message="Sent forward port added")
 

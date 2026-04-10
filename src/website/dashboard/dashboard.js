@@ -149,6 +149,11 @@ function setPortList() {
     .then(data => {
         if (data.success) {
             const portList = document.getElementById('ports-list');
+
+            // Clear the list
+            portList.innerHTML = "";
+
+            // Add ports
             data.ports.forEach(portEntry => {
                 portList.appendChild(createPortEntry(portEntry));
                 portList.appendChild(document.createElement('br'));

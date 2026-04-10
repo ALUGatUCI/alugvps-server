@@ -196,6 +196,9 @@ function createPortEntry(portEntry) {
                 listenDropdown.appendChild(option);
             })
         }
+
+        // Set the current port
+        listenDropdown.value = getPortAddress(portEntry[1]['listen']);
     })
     .catch(error => {
         console.error(`Retrieval of valid ports failed: ${error}`);

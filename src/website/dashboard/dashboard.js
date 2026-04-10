@@ -1,3 +1,5 @@
+import { savePort } from './portManagement.js';
+
 window.onload = function() {
     validateLogin();
 
@@ -223,6 +225,10 @@ function createPortEntry(portEntry) {
     // Create Buttons for managing the port
     const saveButton = document.createElement('button');
     saveButton.textContent = "Save";
+    saveButton.onclick = function() {
+        savePort(portEntry[0], listenDropdown.value, connectTextbox.value);
+        setPortList(); // Refresh after doing the command
+    }
     entry.appendChild(saveButton);
 
     const deleteButton = document.createElement('button');

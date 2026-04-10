@@ -85,3 +85,15 @@ async def create_new_container(account_id: int):
 
     instance = client.containers.create(container_config, wait=True)
     instance.start()
+
+def get_valid_ports(ucinetid: str):
+    """Get valid ports for the user's container"""
+
+    # Get the account from the ID
+    account_id = database.session.exec(select(Account.id).where(Account.email == f"{ucinetid}@uci.edu")).one_or_none()
+    if account_id is None:
+        raise ValueError(f"No account found with ID {account_id}")
+    
+    return database.session.exec(select(Container.forward_ports).where(Container.id == account_id)).one_or_none()
+    
+    

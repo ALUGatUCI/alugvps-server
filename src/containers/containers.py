@@ -7,6 +7,7 @@ from sqlmodel import select
 
 from security import oauth2_scheme
 import database.database as database
+from database.containers import get_valid_ports
 from database.models import Container, Account
 from containers.body import AddPort, RemovePort
 import asyncio
@@ -259,3 +260,19 @@ async def get_used_port_list(token: Annotated[str, fastapi.Depends(oauth2_scheme
             used_ports = _get_forward_ports(container)
 
             return responses.PortsList(success=True, ports=used_ports)
+
+@router.get("/port/valid_ports", response_model=responses.PortsList)
+def get_valid_ports(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
+    """Get all valid ports for this container"""
+    ucinetid = security.verify_credentials(token) # Verify the credentials (An exception will occur if not valid)
+
+    if not security.check_confirmation_status(ucinetid):
+        raise fastapi.HTTPException(status_code=400, detail="Inactive user")
+    
+    if get_container_by_ucinetid(ucinetid) is None:
+        raise fastapi.HTTPException(status_code=400, detail="No container found for this account")
+    
+    try:
+        return get_valid_ports(ucinetid)
+    except Exception as e:
+        raise fastapi.HTTPException(status_code=500, detail=f"An error occurred fetching for valid ports: {e}")

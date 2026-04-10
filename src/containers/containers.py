@@ -201,7 +201,7 @@ async def add_port(token: Annotated[str, fastapi.Depends(oauth2_scheme)], new_fo
 
             # Also validate that the port isn't already in use
             for forward_port in _get_forward_ports(container):
-                if str(new_forward.listen) in forward_port[1]["listen"]:
+                if str(new_forward.listen) in forward_port[1]["listen"] and (new_forward.name != forward_port[0]): # Triggers if listening port is the same and name isn't different
                     raise fastapi.HTTPException(status_code=400, detail="The port is already in use")
 
             new_port_map = {

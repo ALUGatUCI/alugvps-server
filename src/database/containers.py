@@ -94,6 +94,6 @@ def get_valid_ports(ucinetid: str):
     if account_id is None:
         raise ValueError(f"No account found with ID {account_id}")
     
-    return database.session.exec(select(Container.forward_ports).where(Container.id == account_id)).one_or_none()
+    return database.session.exec(select(Container.forward_ports).where(Container.id == account_id)).all()[0]
     
     

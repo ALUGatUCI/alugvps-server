@@ -261,7 +261,7 @@ async def get_used_port_list(token: Annotated[str, fastapi.Depends(oauth2_scheme
 
             return responses.PortsList(success=True, ports=used_ports)
 
-@router.get("/port/valid_ports", response_model=responses.PortsList)
+@router.get("/port/valid_ports", response_model=responses.ValidPorts)
 def get_valid_ports(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
     """Get all valid ports for this container"""
     ucinetid = security.verify_credentials(token) # Verify the credentials (An exception will occur if not valid)

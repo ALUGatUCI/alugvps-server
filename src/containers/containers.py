@@ -214,8 +214,9 @@ async def add_port(token: Annotated[str, fastapi.Depends(oauth2_scheme)], new_fo
             if new_forward.name != "ssh-port" and new_forward.name != "root":
                 container.devices[new_forward.name] = new_port_map
                 container.save()
-
-        return responses.ContainerAction(success=True, message="Sent forward port added")
+                return responses.ContainerAction(success=True, message="Sent forward port added")
+            else:
+                raise fastapi.HTTPException(status_code=403, detail="Attempted to add port with the same name as another device")
 
 @router.delete("/port/delete", response_model=responses.ContainerAction)
 async def remove_port(token: Annotated[str, fastapi.Depends(oauth2_scheme)], remove: RemovePort = Depends()):

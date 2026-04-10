@@ -230,8 +230,9 @@ function createPortEntry(portEntry) {
     // Create Buttons for managing the port
     const saveButton = document.createElement('button');
     saveButton.textContent = "Save";
-    saveButton.onclick = function() {
-        savePort(portEntry[0], listenDropdown.value, connectTextbox.value);
+    saveButton.onclick = async function() {
+        await savePort(portEntry[0], listenDropdown.value, connectTextbox.value);
+        await new Promise(resolve => setTimeout(resolve, 100)); // Delay so the info updates correctly
         setPortList(); // Refresh after doing the command
     }
     entry.appendChild(saveButton);

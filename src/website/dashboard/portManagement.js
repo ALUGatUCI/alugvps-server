@@ -1,11 +1,11 @@
-export function savePort(portName, listen, connect) {
-    fetch("/containers/port/add", {
+export async function savePort(portName, listen, connect) {
+    const params = new URLSearchParams({'name': portName, 'listen': listen, 'connect': connect});
+    return fetch(`/containers/port/add?${params}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem('access_token')}`
         },
-        body: JSON.stringify({'name': portName, 'listen': listen, 'connect': connect})
 
     })
     .then(response => {
@@ -14,6 +14,8 @@ export function savePort(portName, listen, connect) {
     .then(data => {
         if (data.success) {
             alert("The port has successfully be submitted");
+        } else {
+            alert(`An issue occurred submitting the port: ${data.message}`)
         }
     })
     .catch(error => {

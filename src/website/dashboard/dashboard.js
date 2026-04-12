@@ -176,6 +176,43 @@ function setPortList() {
         .catch((error) => {
             console.error(`An error occurred fetching the ports: ${error}`);
         });
+
+    // Add to the port listening options
+    fetch("/containers/port/valid_ports", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+    })
+        .then((response) => {
+            return response.json();
+        })
+        .then((data) => {
+            if (data.success) {
+                const listeningPort = document.getElementById("listening-port");
+                for (const port of data.ports) {
+                    const option = document.createElement("option");
+                    option.textContent = port;
+                    listeningPort.appendChild(option);
+                }
+            }
+        })
+        .catch((error) => {
+            console.error(`Retrieval of valid ports failed: ${error}`);
+        });
+
+    // Set button for port submission
+    const submitButton = document.getElementById("submit-port");
+    submitButton.onclick = async function () {
+        const portName = document.getElementById("port-name").value;
+        const listeningPort = document.getElementById("listening-port").value;
+        const connectPort = document.getElementById("connect-port").value;
+
+        await savePort(portName, listeningPort, connectPort);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        setPortList();
+    };
 }
 
 function createPortEntry(portEntry) {

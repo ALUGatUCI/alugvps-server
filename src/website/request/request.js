@@ -4,6 +4,9 @@ window.onload = function() {
 
     const submit = document.getElementById('submit');
     submit.addEventListener('click', submitRequest);
+
+    const logoutButton = document.getElementById('logout');
+    logoutButton.onclick = logoutButtonFunc
 }
 
 function countChars() {

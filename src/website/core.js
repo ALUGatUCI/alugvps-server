@@ -63,23 +63,47 @@ async function redirectToDashboard() {
     const result = await apiCall.json();
 
     if (result.confirmed) {
-        if (!window.location.href.endsWith('dashboard.html')) {
-            const confirmed = await fetch('/containers/exists', {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    'Authorization': `Bearer ${accessToken}`
+        const confirmed = await fetch('/containers/exists', {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+        if (confirmed.ok) {
+            const data = confirmed.json();
+            if (data.exists) {
+                if (!window.location.href.endsWith('dashboard.html')) {
+                    window.location.href = 'dashboard.html';
                 }
-            });
-            if (confirmed.ok) {
-                window.location.href = 'dashboard.html';
             } else {
-                window.location.href = 'request.html';
+                if (!window.location.href.endsWith('request.html')) {
+                    window.location.href = 'request.html';
+                }
             }
         }
     } else {
         if (!window.location.href.endsWith('confirm.html')) {
             window.location.href = 'confirm.html';
         }
+    }
+}
+
+// This is for logout buttons
+async function logoutButtonFunc() {
+    const response = await fetch('/accounts/logout', {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${localStorage.getItem("access_token")}`,
+        }
+    });
+
+    if (response.ok) {
+        alert("Logged out successfully");
+        window.location.reload()
+    } else {
+        const errorData = await response.json()
+        alert(`An error occurred logging you out: ${errorData.detail}`)
     }
 }

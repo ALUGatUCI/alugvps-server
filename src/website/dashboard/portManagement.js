@@ -8,7 +8,7 @@ export async function savePort(portName, listen, connect) {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            'Authorization': `Bearer ${localStorage.getItem("access_token")}`,
             },
         })
         .then((response) => {
@@ -32,7 +32,7 @@ export async function deletePort(portName) {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            'Authorization': `Bearer ${localStorage.getItem("access_token")}`,
         },
     })
         .then((response) => {

@@ -6,7 +6,7 @@ from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from database import Container
 from database.accounts import Account, add_account_to_database, perform_login, send_confirmation_email
-from database.models import AccountCreation, Request
+from database.models import Request
 import database.database as database
 import database.exceptions as db_exceptions
 from configuration import configuration
@@ -15,7 +15,7 @@ from sqlmodel import select, delete
 from sqlalchemy import func
 from accounts.body import ConfirmationCode, ContainerRequest
 from accounts.responses import AccountConfirmed
-from security import check_confirmation_status
+from security import check_confirmation_status, discard_token
 from containers.containers import get_container_by_ucinetid
 
 from security import oauth2_scheme, verify_credentials
@@ -208,3 +208,22 @@ def login_to_account(username, password) -> str:
         raise fastapi.HTTPException(status_code=401, detail=str(e))
     except db_exceptions.AccountBannedError as e:
         raise fastapi.HTTPException(status_code=403, detail=str(e))
+    
+@router.post('/logout')
+def logout(token: Annotated[str, Depends(oauth2_scheme)]):
+    ucinetid = verify_credentials(token)
+
+    session = database.session
+
+    statement = sqlmodel.select(Account).where(Account.email == f"{ucinetid}@uci.edu")
+    result = session.execute(statement).first()[0]
+
+    if result is None:
+        raise fastapi.HTTPException(status_code=400, detail="Account not found")
+    
+    try:
+        discard_token(token)
+    except Exception as e:
+        raise fastapi.HTTPException(status_code=500, detail=str(e))
+    
+    return fastapi.Response(status_code=200)

@@ -42,4 +42,7 @@ window.onload = function() {
             alert(`An error occurred resending your code: ${errorData.detail}`)
         }
     }
+
+    const logoutButton = document.getElementById('logout');
+    logoutButton.onclick = logoutButtonFunc
 }

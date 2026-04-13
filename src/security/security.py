@@ -6,6 +6,7 @@ from configuration import configuration
 import jwt
 from fastapi import HTTPException, status, Depends
 import fastapi.security as security
+from fastapi.security import OAuth2PasswordRequestForm
 from jwt import InvalidTokenError
 from pwdlib import PasswordHash
 
@@ -25,6 +26,8 @@ credentials_exception = HTTPException(
     headers={"WWW-Authenticate": "Bearer"},
 )
 
+discarded_tokens = []
+
 def verify_credentials(token: Annotated[str, Depends(oauth2_scheme)]):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -41,6 +44,10 @@ def verify_credentials(token: Annotated[str, Depends(oauth2_scheme)]):
     # Ensure the user isn't banned
     if database.session.exec(select(Account.banned).where(Account.email == email)).first():
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User is banned")
+    
+    # Ensure the token isn't discord (due to logout)
+    if token in discarded_tokens:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Token is discarded")
 
     return ucinetid
 
@@ -51,3 +58,6 @@ def check_confirmation_status(ucinetid: str):
     result = session.execute(statement).first()[0]
 
     return result.confirmed
+
+def discard_token(token: Annotated[OAuth2PasswordRequestForm, Depends()]):
+    discarded_tokens.append(token)

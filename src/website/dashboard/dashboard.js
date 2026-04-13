@@ -10,6 +10,8 @@ window.onload = function () {
     const rebootButton = document
         .getElementById("reboot")
         .addEventListener("click", rebootVPS);
+    const logoutButton = document.getElementById('logout');
+    logoutButton.onclick = logoutButtonFunc
 
     // Fetch the SSH address on page load
     setSSHAddress();

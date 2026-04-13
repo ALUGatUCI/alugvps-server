@@ -1,4 +1,6 @@
 window.onload = function() {
+    validateLogin();
+
     const input = document.getElementById('answer');
     input.addEventListener('input', countChars);
 
@@ -15,28 +17,26 @@ function countChars() {
     charCount.textContent = `Characters (300 minimum): ${input.value.length}`;
 }
 
-function submitRequest() {
+async function submitRequest() {
     const answer = document.getElementById('answer').value;
     if (answer.length < 300) {
         alert('Please provide a more detailed answer (at least 300 characters).');
         return;
     }
 
-    fetch('/accounts/request_container', {
+    const request = await fetch('/accounts/request_container', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
         },
-        body: JSON.stringify({ request_body: answer })
+        body: JSON.stringify({ 'request_body' : answer })
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Your request has been submitted successfully! You will receive an email if we approve your request.');
-            window.location.href = 'dashboard.html';
-        } else {
-            alert('There was an error submitting your request: ' + (data.detail || 'Unknown error'));
-        }
-    })
+    
+    if (request.ok) {
+        alert("Your request has been successfully submitted. You will receive an email when we approve your request.")
+    } else {
+        const errorData = await request.json();
+        alert(`An error occurred submitting your request: ${errorData.detail}`)
+    }
 }

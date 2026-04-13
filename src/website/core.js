@@ -63,15 +63,15 @@ async function redirectToDashboard() {
     const result = await apiCall.json();
 
     if (result.confirmed) {
-        const confirmed = await fetch('/containers/exists', {
+        const hasContainer = await fetch('/containers/exists', {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 'Authorization': `Bearer ${accessToken}`
             }
         });
-        if (confirmed.ok) {
-            const data = confirmed.json();
+        if (hasContainer.ok) {
+            const data = await hasContainer.json();
             if (data.exists) {
                 if (!window.location.href.endsWith('dashboard.html')) {
                     window.location.href = 'dashboard.html';

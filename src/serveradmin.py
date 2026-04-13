@@ -7,6 +7,7 @@ import sys
 import asyncio
 from database.models import Request, Account
 from database.containers import create_new_container
+from containers.containers import suspend_container_by_ucinetid, unsuspend_container_by_ucinetid
 from configuration import configuration
 
 # Create the database engine and session
@@ -66,6 +67,7 @@ async def entry_point():
             if user is not None:
                 user.banned = True
                 session.commit()
+                await suspend_container_by_ucinetid(user.email[:user.email.index("@")]) # Suspend the user's container
                 print(f"Banned user with ID {arguments[2]}")
             else:
                 print(f"No user found with ID {arguments[2]}")
@@ -74,6 +76,7 @@ async def entry_point():
             if user is not None:
                 user.banned = False
                 session.commit()
+                await unsuspend_container_by_ucinetid(user.email[:user.email.index("@")]) # Unsuspend the user's container
                 print(f"Unbanned user with ID {arguments[2]}")
             else:
                 print(f"No user found with ID {arguments[2]}")

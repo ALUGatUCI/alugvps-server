@@ -7,7 +7,7 @@
         <title>Create Account - ALUG@UCI VPS Services</title>
         <link rel="stylesheet" href="styles.css" />
         <script src="core.js"></script>
-        <script type="module" src="createAccount/createAccount.js"></script>
+        <script type="module" src="confirm/confirm.js"></script>
     </head>
 
     <body>
@@ -15,6 +15,10 @@
             <h1>Account Confirmation</h1>
             <p>Please check your email for a verification code. Then enter it below to confirm your account.</p>
 
-            <input type="text" placeholder="Confirmation Code">
+            <input id="confirm-code" type="text" placeholder="Confirmation Code">
+            <br>
+            <button id="submit" type="button">Confirm</button>
+            <br>
+            <button id="resend" type="button">Resend</button>
         </div>
     </body>

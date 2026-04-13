@@ -37,6 +37,18 @@ def _create_access_token(data: dict, expires_delta: timedelta | None = None):
 
     return encoded_jwt
 
+async def send_confirmation_email(new_account: Account):
+    subject = "ALUG@UCI VPS Services Account Confirmation"
+    send_to = new_account.email
+    contents = (
+        f"Hello,\n"
+        "If you didn't sign up to use ALUG@UCI's VPS services, please ignore this email.\n"
+        "Otherwise, please enter this confirmation code to continue the account creation process.\n"
+        f"Code: {new_account.confirmation_code}"
+    )
+
+    await send_email(subject, send_to, contents)
+
 async def add_account_to_database(account: Annotated[OAuth2PasswordRequestForm, fastapi.Depends()]):
     """Create an account and add it to the database"""
 
@@ -60,17 +72,8 @@ async def add_account_to_database(account: Annotated[OAuth2PasswordRequestForm, 
     session.refresh(new_account)
 
     # Send a confirmation email
-
-    subject = "ALUG@UCI VPS Services Account Confirmation"
-    send_to = new_account.email
-    contents = (
-        f"Hello,\n"
-        "If you didn't sign up to use ALUG@UCI's VPS services, please ignore this email.\n"
-        "Otherwise, please enter this confirmation code to continue the account creation process.\n"
-        f"Code: {new_account.confirmation_code}"
-    )
-
-    await send_email(subject, send_to, contents)
+    send_confirmation_email(new_account)
+    
 
 def perform_login(email: str, password: str):
     """Perform a login and return a token"""

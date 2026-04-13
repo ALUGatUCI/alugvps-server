@@ -27,7 +27,7 @@ window.onload = function() {
 
     resendButton.onclick = async function() {
         const response = await fetch('/accounts/resend_code', {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("access_token")}`,

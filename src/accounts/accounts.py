@@ -5,7 +5,7 @@ import fastapi
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from database import Container
-from database.accounts import Account, add_account_to_database, perform_login
+from database.accounts import Account, add_account_to_database, perform_login, send_confirmation_email
 from database.models import AccountCreation, Request
 import database.database as database
 import database.exceptions as db_exceptions
@@ -43,6 +43,25 @@ async def confirm_account(token: Annotated[str, fastapi.Depends(oauth2_scheme)],
     # Assuming all checks pass, changed their confirmed status and create container
     result.confirmed = True
     session.commit()
+
+    return fastapi.Response(status_code=201)
+
+@router.get('/resend_code')
+async def resend_code_by_email(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
+    ucinetid = verify_credentials(token)
+
+    session = database.session
+
+    statement = sqlmodel.select(Account).where(Account.email == f"{ucinetid}@uci.edu")
+    result = session.execute(statement).first()[0]
+
+    if result is None:
+        raise fastapi.HTTPException(status_code=400, detail="Account not found")
+    
+    try:
+        await send_confirmation_email(result)
+    except Exception as e:
+        raise fastapi.HTTPException(status_code=500, detail=str(e))
 
     return fastapi.Response(status_code=201)
 

@@ -24,19 +24,22 @@ async function submitRequest() {
         return;
     }
 
-    const request = await fetch('/accounts/request_container', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-        },
-        body: JSON.stringify({ 'request_body' : answer })
-    })
-    
-    if (request.ok) {
-        alert("Your request has been successfully submitted. You will receive an email when we approve your request.")
-    } else {
-        const errorData = await request.json();
-        alert(`An error occurred submitting your request: ${errorData.detail}`)
+
+    if (confirm("Are you sure you want to submit your application? You will not be able to make any changes once you submit it.")) {
+        const request = await fetch('/accounts/request_container', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+            },
+            body: JSON.stringify({ 'request_body': answer })
+        })
+
+        if (request.ok) {
+            alert("Your request has been successfully submitted. You will receive an email when we approve your request.")
+        } else {
+            const errorData = await request.json();
+            alert(`An error occurred submitting your request: ${errorData.detail}`)
+        }
     }
 }

@@ -1,10 +1,6 @@
 function validateLogin() {
     // Automatically redirect to login if access token exists and is not valid
     const accessToken = localStorage.getItem('access_token');
-    
-    if (window.location.href.endsWith('index.html')) {
-        return;
-    }
 
     if (!accessToken) {
         window.location.href = 'index.html';
@@ -14,6 +10,7 @@ function validateLogin() {
     fetch('/accounts/verify_token', {
         method: 'GET',
         headers: {
+            "Content-Type": "application/json",
             'Authorization': `Bearer ${accessToken}`
         }
     }).then(response => {
@@ -50,27 +47,36 @@ function validateLogin() {
 }
 
 async function redirectToDashboard() {
+    const accessToken = localStorage.getItem('access_token');
+
     const apiCall = await fetch('/accounts/account_confirmed', {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
+            'Authorization': `Bearer ${accessToken}`
         }
     });
-    const result = await apiCall.json().confirmed;
+    const result = await apiCall.json();
 
-    if (result) {
+    if (result.confirmed) {
         window.location.href = 'dashboard.html';
     } else {
         const confirmed = await fetch('/containers/exists', {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                'Authorization': `Bearer ${accessToken}`
             }
         });
+
         if (!confirmed.ok) {
-            window.location.href = 'confirm.html';
+            if (!window.location.href.endsWith('confirm.html')) {
+                window.location.href = 'confirm.html';
+            }
         } else {
-            window.location.href = 'request.html';
+            if (!window.location.href.endsWith('request.html')) {
+                window.location.href = 'request.html';
+            }
         }
     }
 }

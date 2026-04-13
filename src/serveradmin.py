@@ -2,10 +2,12 @@
 
 import pathlib
 import sqlmodel
+from sqlmodel import select, func
 import sys
 import asyncio
 from database.models import Request, Account
 from database.containers import create_new_container
+from configuration import configuration
 
 # Create the database engine and session
 database_path = pathlib.Path.home() / ".alugvps-server" / "alugvps.db"
@@ -25,6 +27,15 @@ async def entry_point():
             else:
                 print(f"No request found with ID {arguments[2]}")
         if arguments[1] == "approve": # Approve a request with the given ID
+            # Check if there is anymore space for accounts
+            if configuration.read_config_file("acc_limit") is not None:
+                statement = select(func.count()).select_from(Account)
+                result = session.execute(statement).one()[0]
+
+                if result >= configuration.read_config_file("acc_limit"):
+                    print("Account limit on server reached")
+                    sys.exit(1)
+
             request = session.get(Request, int(arguments[2]))
             if request is not None:
                 # Create the container

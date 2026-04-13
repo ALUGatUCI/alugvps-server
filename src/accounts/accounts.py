@@ -57,7 +57,7 @@ async def resend_code_by_email(token: Annotated[str, fastapi.Depends(oauth2_sche
 
     if result is None:
         raise fastapi.HTTPException(status_code=400, detail="Account not found")
-    
+
     try:
         await send_confirmation_email(result)
     except Exception as e:
@@ -77,7 +77,7 @@ async def is_account_confirmed(token: Annotated[str, fastapi.Depends(oauth2_sche
 
     if result is None:
         raise fastapi.HTTPException(status_code=400, detail="Account not found")
-    
+
     return AccountConfirmed(confirmed=result.confirmed)
 
 @router.get("/verify_token")
@@ -96,7 +96,7 @@ async def request_container(token: Annotated[str, fastapi.Depends(oauth2_scheme)
 
     if not check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
-    
+
     if get_container_by_ucinetid(ucinetid) is None:
         raise fastapi.HTTPException(status_code=400, detail="No container found for this account")
 
@@ -119,14 +119,6 @@ async def request_container(token: Annotated[str, fastapi.Depends(oauth2_scheme)
 @router.post("/create_account")
 async def create_account(account: Annotated[OAuth2PasswordRequestForm, fastapi.Depends()]):
     """Do the password creation logic"""
-
-    # Check if there is anymore space for accounts
-    if configuration.read_config_file("acc_limit") is not None:
-        statement = select(func.count()).select_from(Account)
-        result = database.session.execute(statement).one()[0]
-
-        if result >= configuration.read_config_file("acc_limit"):
-            raise fastapi.HTTPException(status_code=400, detail="Account limit on server reached")
 
     # Start with validating the emails
     if not account.username.endswith("@uci.edu"):
@@ -208,7 +200,7 @@ def login_to_account(username, password) -> str:
         raise fastapi.HTTPException(status_code=401, detail=str(e))
     except db_exceptions.AccountBannedError as e:
         raise fastapi.HTTPException(status_code=403, detail=str(e))
-    
+
 @router.post('/logout')
 def logout(token: Annotated[str, Depends(oauth2_scheme)]):
     ucinetid = verify_credentials(token)
@@ -220,10 +212,10 @@ def logout(token: Annotated[str, Depends(oauth2_scheme)]):
 
     if result is None:
         raise fastapi.HTTPException(status_code=400, detail="Account not found")
-    
+
     try:
         discard_token(token)
     except Exception as e:
         raise fastapi.HTTPException(status_code=500, detail=str(e))
-    
+
     return fastapi.Response(status_code=200)

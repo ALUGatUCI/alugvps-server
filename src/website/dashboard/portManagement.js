@@ -9,8 +9,8 @@ export async function savePort(portName, listen, connect) {
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-    })
+            },
+        })
         .then((response) => {
             return response.json();
         })

@@ -3,6 +3,7 @@
 import pathlib
 import sqlmodel
 import sys
+import asyncio
 from database.models import Request, Account
 from database.containers import create_new_container
 
@@ -15,8 +16,7 @@ session = sqlmodel.Session(engine)
 # Get the command line arguments
 arguments = sys.argv
 
-# Implement a simple CLI for managing requests and users
-if __name__ == "__main__":
+async def entry_point():
     if len(arguments) == 3:
         if arguments[1] == "view": # View a request with the given ID
             request = session.get(Request, int(arguments[2]))
@@ -29,7 +29,7 @@ if __name__ == "__main__":
             if request is not None:
                 # Create the container
                 try:
-                    create_new_container(request.id)
+                    await create_new_container(request.id)
                 except Exception as e:
                     print(f"Error creating container: {e}")
                     sys.exit(1)
@@ -88,3 +88,7 @@ if __name__ == "__main__":
                 print(f"Unknown delete type: {arguments[2]}")
     else:
         print("Implement help later")
+
+# Implement a simple CLI for managing requests and users
+if __name__ == "__main__":
+    asyncio.run(entry_point())

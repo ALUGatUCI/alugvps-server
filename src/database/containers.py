@@ -13,7 +13,10 @@ from security.shacrypt512 import shacrypt
 
 async def create_new_container(account_id: int):
     """Creates a new container upon account creation"""
+    database.create_db_and_tables()
 
+    session = database.session
+    
     # Get the account from the ID
     account = session.exec(select(Account).where(Account.id == account_id)).one_or_none()
     if account is None:
@@ -30,7 +33,6 @@ async def create_new_container(account_id: int):
     )
 
     # Add the container data to the table
-    session = database.session
 
     session.add(new_container)
     session.commit()
@@ -46,7 +48,7 @@ async def create_new_container(account_id: int):
         "ephemeral": False,
         "source": {
             'type': 'image',
-            'alias': 'noble',
+            'fingerprint': configuration.read_config_file("cpu_limit"),
         },
         "config": {
             "limits.cpu": f"{configuration.read_config_file("cpu_limit")}",

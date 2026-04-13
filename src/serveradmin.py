@@ -7,7 +7,7 @@ import sys
 import asyncio
 from database.models import Request, Account
 from database.containers import create_new_container
-from containers.containers import suspend_container_by_ucinetid, unsuspend_container_by_ucinetid
+from containers.containers import suspend_container_by_ucinetid, unsuspend_container_by_ucinetid, delete_container_by_ucinetid
 from configuration import configuration
 
 # Create the database engine and session
@@ -95,6 +95,7 @@ async def entry_point():
                 if user is not None:
                     session.delete(user)
                     session.commit()
+                    await delete_container_by_ucinetid(user.email[:user.email.index("@")]) # Delete the container associated with the user
                     print(f"Deleted user with ID {arguments[3]}")
                 else:
                     print(f"No user found with ID {arguments[3]}")

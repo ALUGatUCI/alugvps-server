@@ -41,6 +41,14 @@ async def unsuspend_container_by_ucinetid(ucinetid: str):
 
     return None
 
+async def delete_container_by_ucinetid(ucinetid: str):
+    container = await get_container_by_ucinetid(ucinetid)
+    if container is not None:
+        await asyncio.to_thread(container.stop, wait=True)
+        await asyncio.to_thread(container.delete, wait=True)
+
+    return None
+
 def _get_forward_ports(container: client.containers):
     used_ports = []
 

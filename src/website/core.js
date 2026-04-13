@@ -3,7 +3,9 @@ function validateLogin() {
     const accessToken = localStorage.getItem('access_token');
 
     if (!accessToken) {
-        window.location.href = 'index.html';
+        if (!window.location.href.endsWith('index.html')) {
+            window.location.href = 'index.html';
+        }
     }
 
     // Check if the token is valid by making a request to a protected endpoint
@@ -16,7 +18,9 @@ function validateLogin() {
     }).then(response => {
         if (response.status === 401) {
             localStorage.removeItem('access_token');
-            window.location.href = 'index.html';
+            if (!window.location.href.endsWith('index.html')) {
+                window.location.href = 'index.html';
+            }
         } else {
             redirectToDashboard();
         }

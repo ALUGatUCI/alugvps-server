@@ -39,13 +39,14 @@ async function login() {
         body: `username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
     })
 
-    if (data.access_token) {
+    if (data.ok) {
+        const responseData = await data.json();
         // Store the access token in local storage
-        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('access_token', responseData.access_token);
         alert('Login successful!');
         // Redirect to the dashboard or another page
         redirectToDashboard();
     } else {
-        alert('Login failed: ' + (data.detail || 'Unknown error'));
+        alert('Login failed: ' + (data.statusText || 'Unknown error'));
     }
 }

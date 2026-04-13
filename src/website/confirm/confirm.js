@@ -19,6 +19,7 @@ window.onload = function() {
 
         if (response.ok) {
             alert("Account successfully confirmed");
+            window.location.reload(); // Reload the page to redirect the user to the next step *sigh*
         } else {
             const errorData = await response.json();
             alert(`An error occurred confirming your code: ${errorData.detail}`)

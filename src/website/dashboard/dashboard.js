@@ -1,5 +1,3 @@
-import { savePort, deletePort } from "./portManagement.js";
-
 window.onload = function () {
     validateLogin();
 

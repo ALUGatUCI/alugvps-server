@@ -59,24 +59,23 @@ async function redirectToDashboard() {
     const result = await apiCall.json();
 
     if (result.confirmed) {
-        window.location.href = 'dashboard.html';
-    } else {
-        const confirmed = await fetch('/containers/exists', {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                'Authorization': `Bearer ${accessToken}`
-            }
-        });
-
-        if (!confirmed.ok) {
-            if (!window.location.href.endsWith('confirm.html')) {
-                window.location.href = 'confirm.html';
-            }
-        } else {
-            if (!window.location.href.endsWith('request.html')) {
+        if (!window.location.href.endsWith('dashboard.html')) {
+            const confirmed = await fetch('/containers/exists', {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+            if (confirmed.ok) {
+                window.location.href = 'dashboard.html';
+            } else {
                 window.location.href = 'request.html';
             }
+        }
+    } else {
+        if (!window.location.href.endsWith('confirm.html')) {
+            window.location.href = 'confirm.html';
         }
     }
 }

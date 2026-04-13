@@ -14,6 +14,7 @@ import sqlmodel
 from sqlmodel import select, delete
 from sqlalchemy import func
 from accounts.body import ConfirmationCode, ContainerRequest
+from accounts.responses import AccountConfirmed
 from security import check_confirmation_status
 from containers.containers import get_container_by_ucinetid
 
@@ -44,6 +45,21 @@ async def confirm_account(token: Annotated[str, fastapi.Depends(oauth2_scheme)],
     session.commit()
 
     return fastapi.Response(status_code=201)
+
+@router.get('/account_confirmed', response_model=AccountConfirmed)
+async def is_account_confirmed(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
+    """Check if the account is confirmed"""
+    ucinetid = verify_credentials(token)
+
+    session = database.session
+
+    statement = sqlmodel.select(Account).where(Account.email == f"{ucinetid}@uci.edu")
+    result = session.execute(statement).first()[0]
+
+    if result is None:
+        raise fastapi.HTTPException(status_code=400, detail="Account not found")
+    
+    return AccountConfirmed(confirmed=result.confirmed)
 
 @router.get("/verify_token")
 def verify_token(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):

@@ -8,6 +8,5 @@ Server backend software for managing remote Linux LXC containers
 - PyJWT
 
 ## Things that must be implemented:
-- **Rewrite the front-end in React**
-- Implement the front-end website (src/website)
 - Rework program to use dotenv
+- Add Docker support

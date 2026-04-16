@@ -6,6 +6,8 @@ Server backend software for managing remote Linux LXC containers
 - FastAPI
 - LXD
 - PyJWT
+- python-dotenv
+- aiosmtpd
 
 ## Things that must be implemented:
 - Add Docker support

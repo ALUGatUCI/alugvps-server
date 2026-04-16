@@ -40,7 +40,7 @@ def _launch_app():
     app.include_router(containers, prefix="/containers")
     app.include_router(accounts, prefix="/accounts")
 
-    uvicorn.run(app, host="0.0.0.0", port=configuration.read_config_file("port"))
+    uvicorn.run(app, host="0.0.0.0", port=int(configuration.read_config_file("port")))
 
 if __name__ == "__main__":
     # Do a platform check

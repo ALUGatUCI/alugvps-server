@@ -33,7 +33,7 @@ async def entry_point():
                 statement = select(func.count()).select_from(Account)
                 result = session.execute(statement).one()[0]
 
-                if result >= configuration.read_config_file("acc_limit"):
+                if result >= int(configuration.read_config_file("acc_limit")):
                     print("Account limit on server reached")
                     sys.exit(1)
 

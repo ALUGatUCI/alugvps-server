@@ -17,7 +17,7 @@ async def send_email(
     message.set_content(content)
 
     smtp_host = read_config_file("smtp_host")
-    smtp_port = read_config_file("smtp_port")
+    smtp_port = int(read_config_file("smtp_port"))
     username = email
     password = read_config_file("email_key")
 

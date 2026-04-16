@@ -8,6 +8,5 @@ Server backend software for managing remote Linux LXC containers
 - PyJWT
 
 ## Things that must be implemented:
-- Rework program to use dotenv
 - Add Docker support
 - Implement email-based 2FA

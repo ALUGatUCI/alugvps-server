@@ -17,6 +17,21 @@ from security import oauth2_scheme
 
 router = fastapi.APIRouter()
 
+public_ip = None
+# Get the public IP address of the server
+with httpx.Client() as httpx_client:
+    try:
+        response = httpx_client.get("https://api.ipify.org?format=json")
+        response.raise_for_status()
+        public_ip = response.json()["ip"]
+    except httpx.RequestError as e:
+        raise fastapi.HTTPException(
+            status_code=500, detail=f"Error retrieving public IP address: {e}"
+        )
+    except httpx.HTTPStatusError as e:
+        raise fastapi.HTTPException(
+            status_code=500, detail=f"Error retrieving public IP address: {e}"
+        )
 
 async def get_container_by_ucinetid(ucinetid: str):
     containers = await asyncio.to_thread(client.containers.all)
@@ -89,21 +104,6 @@ async def get_container_connection_port(
         raise fastapi.HTTPException(
             status_code=400, detail="No container found for this account"
         )
-
-    # Get the public IP address of the server
-    with httpx.Client() as client:
-        try:
-            response = client.get("https://api.ipify.org?format=json")
-            response.raise_for_status()
-            public_ip = response.json()["ip"]
-        except httpx.RequestError as e:
-            raise fastapi.HTTPException(
-                status_code=500, detail=f"Error retrieving public IP address: {e}"
-            )
-        except httpx.HTTPStatusError as e:
-            raise fastapi.HTTPException(
-                status_code=500, detail=f"Error retrieving public IP address: {e}"
-            )
 
     # Now get the assigned port of the container
     session = database.session

@@ -62,9 +62,7 @@ def _get_forward_ports(container: client.containers):
 @router.get("/exists")
 async def check_container_exists(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
     """Checks if a container exists for the account"""
-    ucinetid = security.verify_credentials(
-        token
-    )  # Verify the credentials (An exception will occur if not valid)
+    ucinetid = security.verify_credentials(token)  # Verify the credentials (An exception will occur if not valid)
 
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
@@ -82,9 +80,7 @@ async def get_container_connection_port(
     token: Annotated[str, fastapi.Depends(oauth2_scheme)],
 ):
     """Get the address of the account's container"""
-    ucinetid = security.verify_credentials(
-        token
-    )  # Verify the credentials (An exception will occur if not valid)
+    ucinetid = security.verify_credentials(token)  # Verify the credentials (An exception will occur if not valid)
 
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
@@ -125,9 +121,7 @@ async def get_container_connection_port(
 @router.get("/status", response_model=responses.ContainerStatus)
 async def container_status(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
     """Get the status of the current container"""
-    ucinetid = security.verify_credentials(
-        token
-    )  # Verify the credentials (An exception will occur if not valid)
+    ucinetid = security.verify_credentials(token)  # Verify the credentials (An exception will occur if not valid)
 
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
@@ -151,9 +145,7 @@ async def container_status(token: Annotated[str, fastapi.Depends(oauth2_scheme)]
 @router.put("/start", response_model=responses.ContainerAction)
 async def container_start(token: Annotated[str, Depends(oauth2_scheme)]):
     """Start the named container"""
-    ucinetid = security.verify_credentials(
-        token
-    )  # Verify the credentials (An exception will occur if not valid)
+    ucinetid = security.verify_credentials(token)  # Verify the credentials (An exception will occur if not valid)
 
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
@@ -182,9 +174,7 @@ async def container_start(token: Annotated[str, Depends(oauth2_scheme)]):
 @router.put("/stop", response_model=responses.ContainerAction)
 async def container_stop(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
     """Stop the named container"""
-    ucinetid = security.verify_credentials(
-        token
-    )  # Verify the credentials (An exception will occur if not valid)
+    ucinetid = security.verify_credentials(token)  # Verify the credentials (An exception will occur if not valid)
 
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
@@ -213,9 +203,7 @@ async def container_stop(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
 @router.put("/restart", response_model=responses.ContainerAction)
 async def container_restart(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
     """Restart the named container"""
-    ucinetid = security.verify_credentials(
-        token
-    )  # Verify the credentials (An exception will occur if not valid)
+    ucinetid = security.verify_credentials(token)  # Verify the credentials (An exception will occur if not valid)
 
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
@@ -248,9 +236,7 @@ async def add_port(
 ):
     """Add forward port to the container"""
 
-    ucinetid = security.verify_credentials(
-        token
-    )  # Verify the credentials (An exception will occur if not valid)
+    ucinetid = security.verify_credentials(token)  # Verify the credentials (An exception will occur if not valid)
 
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
@@ -317,9 +303,7 @@ async def remove_port(
     remove: RemovePort = Depends(),
 ):
     """Removes a specified port"""
-    ucinetid = security.verify_credentials(
-        token
-    )  # Verify the credentials (An exception will occur if not valid)
+    ucinetid = security.verify_credentials(token)  # Verify the credentials (An exception will occur if not valid)
 
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
@@ -354,9 +338,7 @@ async def remove_port(
 @router.get("/port/list", response_model=responses.PortsList)
 async def get_used_port_list(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
     """Retrieves a list of all used forwarding ports"""
-    ucinetid = security.verify_credentials(
-        token
-    )  # Verify the credentials (An exception will occur if not valid)
+    ucinetid = security.verify_credentials(token)  # Verify the credentials (An exception will occur if not valid)
 
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
@@ -377,9 +359,7 @@ async def get_used_port_list(token: Annotated[str, fastapi.Depends(oauth2_scheme
 @router.get("/port/valid_ports", response_model=responses.ValidPorts)
 async def get_valid_ports(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
     """Get all valid ports for this container"""
-    ucinetid = security.verify_credentials(
-        token
-    )  # Verify the credentials (An exception will occur if not valid)
+    ucinetid = security.verify_credentials(token)  # Verify the credentials (An exception will occur if not valid)
 
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")

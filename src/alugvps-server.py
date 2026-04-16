@@ -48,6 +48,13 @@ if __name__ == "__main__":
         print("You must be running Linux for this software to function")
         sys.exit(0)
 
+    # Check if the environment variables are set
+    try:
+        configuration.verify_config()
+    except Exception as e:
+        print(f"Error: {e}")
+        sys.exit(1)
+
     _launch_app() # Main function
 
     sys.exit(0)

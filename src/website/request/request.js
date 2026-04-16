@@ -14,7 +14,13 @@ window.onload = function() {
 function countChars() {
     const input = document.getElementById('answer');
     const charCount = document.getElementById('counter');
-    charCount.textContent = `Characters (300 minimum): ${input.value.length}`;
+    charCount.textContent = `Characters (300 minimum and 1000 maximum): ${input.value.length}`;
+
+    if (input.value.length > 1000 || input.value.length < 300) {
+        charCount.style.color = 'red';
+    } else {
+        charCount.style.color = 'black';
+    }
 }
 
 async function submitRequest() {
@@ -22,8 +28,10 @@ async function submitRequest() {
     if (answer.length < 300) {
         alert('Please provide a more detailed answer (at least 300 characters).');
         return;
+    } else if (answer.length > 1000) {
+        alert('Please provide a more concise answer (at most 1000 characters).');
+        return;
     }
-
 
     if (confirm("Are you sure you want to submit your application? You will not be able to make any changes once you submit it.")) {
         const request = await fetch('/accounts/request_container', {

@@ -107,7 +107,8 @@ async def request_container(token: Annotated[str, fastapi.Depends(oauth2_scheme)
     if session.exec(select(Request.id).where(Request.id == acc_id)).first() is not None:
         raise fastapi.HTTPException(status_code=400, detail="You already have a pending request")
 
-    if len(request.request_body.strip()) < 300:
+    req_len = len(request.request_body.strip())
+    if req_len < 300 or req_len > 1000:
         raise fastapi.HTTPException(status_code=400, detail="A minimum of 300 characters is required")
 
     new_request = Request(id=acc_id, request=request.request_body)

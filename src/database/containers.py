@@ -90,8 +90,12 @@ async def create_new_container(account_id: int):
 
 def delete_container(ucinetid: str):
     session = database.session
-    statement = delete(Container).where(select(Account.id).where(Account.email == f"{ucinetid}@uci.edu"))
-    session.execute(statement)
+    statement_1 = select(Account.id).where(Account.email == f"{ucinetid}@uci.edu")
+    account_id = session.execute(statement_1).one_or_none()
+    if account_id is None:
+        return
+    statement_2 = delete(Container).where(Container.id == account_id[0])
+    session.execute(statement_2)
     session.commit()
 
 def get_valid_ports(ucinetid: str):

@@ -1,7 +1,7 @@
 # alugvps-server
 Server backend software for managing remote Linux LXC containers
 
-## Technologies Used
+## Libraries/Technologies Used
 - Uvicorn
 - FastAPI
 - LXD
@@ -10,5 +10,5 @@ Server backend software for managing remote Linux LXC containers
 - aiosmtpd
 
 ## Things that must be implemented:
-- Add Docker support
+- Add suppport for Docker deployment
 - Implement email-based 2FA

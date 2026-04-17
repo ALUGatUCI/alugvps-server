@@ -24,15 +24,8 @@ with httpx.Client() as httpx_client:
         response = httpx_client.get("https://api.ipify.org?format=json")
         response.raise_for_status()
         public_ip = response.json()["ip"]
-    except httpx.RequestError as e:
-        raise fastapi.HTTPException(
-            status_code=500, detail=f"Error retrieving public IP address: {e}"
-        )
-    except httpx.HTTPStatusError as e:
-        raise fastapi.HTTPException(
-            status_code=500, detail=f"Error retrieving public IP address: {e}"
-        )
-
+    except:
+        public_ip = None
 async def get_container_by_ucinetid(ucinetid: str):
     containers = await asyncio.to_thread(client.containers.all)
 

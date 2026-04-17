@@ -7,6 +7,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.security.oauth2 import OAuth2
 from database import Container
 from database.accounts import Account, add_account_to_database, perform_login, send_confirmation_email
+from database.models import Request as RequestModel
 import database.database as database
 import database.exceptions as db_exceptions
 import sqlmodel
@@ -104,7 +105,7 @@ async def request_container(token: Request, request: ContainerRequest):
 
     acc_id = session.exec(select(Account.id).where(Account.email == f"{ucinetid}@uci.edu")).first()
     # Validate the request is valid
-    if session.exec(select(Request.id).where(Request.id == acc_id)).first() is not None:
+    if session.exec(select(RequestModel.id).where(RequestModel.id == acc_id)).first() is not None:
         raise fastapi.HTTPException(status_code=400, detail="You already have a pending request")
 
     req_len = len(request.request_body.strip())

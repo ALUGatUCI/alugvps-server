@@ -60,7 +60,10 @@ def check_confirmation_status(ucinetid: str):
     session = database.session
 
     statement = select(Account).where(Account.email == f"{ucinetid}@uci.edu")
-    result = session.execute(statement).first()[0]
+    result = session.execute(statement).first()
+
+    if result is None:
+        return False
 
     return result.confirmed
 

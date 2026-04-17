@@ -1,7 +1,5 @@
-import asyncio
-
 from sqlalchemy import func
-from sqlmodel import select
+from sqlmodel import select, delete
 
 import configuration
 from database.models import Account
@@ -89,6 +87,12 @@ async def create_new_container(account_id: int):
 
     instance = client.containers.create(container_config, wait=True)
     instance.start()
+
+def delete_container(ucinetid: str):
+    session = database.session
+    statement = delete(Container).where(select(Account.id).where(Account.email == f"{ucinetid}@uci.edu"))
+    session.execute(statement)
+    session.commit()
 
 def get_valid_ports(ucinetid: str):
     """Get valid ports for the user's container"""

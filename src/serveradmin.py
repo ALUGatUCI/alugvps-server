@@ -44,7 +44,7 @@ async def entry_point():
                 # Create the container
                 try:
                     await create_new_container(request.id)
-                    await approval_email(request.id)
+                    await approval_email(request.id, session)
                 except Exception as e:
                     print(f"Error creating container: {e}")
                     sys.exit(1)
@@ -88,7 +88,7 @@ async def entry_point():
             if arguments[2] == "request":
                 request = session.get(Request, int(arguments[3]))
                 if request is not None:
-                    await not_selected_email(request.id)
+                    await not_selected_email(request.id, session)
                     session.delete(request)
                     session.commit()
                     print(f"Deleted request with ID {arguments[3]}")

@@ -54,6 +54,8 @@ async def delete_container_by_ucinetid(ucinetid: str):
     if container is not None:
         await asyncio.to_thread(container.stop, wait=True)
         await asyncio.to_thread(container.delete, wait=True)
+        # Delete container from the database
+        db_containers.delete_container(ucinetid)
 
     return None
 

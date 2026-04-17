@@ -14,6 +14,8 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+secure_mode = "--insecure" not in sys.argv
+
 app = FastAPI()
 
 app.mount("/website", StaticFiles(directory=os.path.join(BASE_DIR, "website"), html=True), name="website")
@@ -31,7 +33,7 @@ def login_with_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depe
         key="token",
         value=token,
         httponly=True,
-        secure=False,
+        secure=secure_mode,
         samesite="strict",
         max_age=1800,
         path="/"

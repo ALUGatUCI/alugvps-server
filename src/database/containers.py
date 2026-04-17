@@ -93,10 +93,10 @@ def delete_container(ucinetid: str):
     session = database.session
 
     statement_1 = select(Account.id).where(Account.email == f"{ucinetid}@uci.edu")
-    account_id = session.exec(statement_1).one()
+    account_id = session.exec(statement_1).first()
     if account_id is None:
         return
-    statement_2 = delete(Container).where(Container.id == account_id[0])
+    statement_2 = delete(Container).where(Container.id == account_id)
     session.exec(statement_2)
     session.commit()
 

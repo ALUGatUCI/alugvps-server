@@ -72,7 +72,7 @@ async def add_account_to_database(account: Annotated[OAuth2PasswordRequestForm, 
     session.refresh(new_account)
 
     # Send a confirmation email
-    send_confirmation_email(new_account)
+    await send_confirmation_email(new_account)
 
 
 def perform_login(email: str, password: str):

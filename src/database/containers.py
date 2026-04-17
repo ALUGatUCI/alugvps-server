@@ -24,9 +24,6 @@ async def create_new_container(account_id: int):
 
     # Calculate the SSH port forwarding number
     # We need to make it so that removing or deleting containers will not result in port collision
-    statement = select(func.count(Account.id))
-    result = database.session.execute(statement).one()[0]
-
     max_ssh_port = session.execute(select(func.max(Container.ssh_port))).one()[0]
     next_ssh_port = 10000 if max_ssh_port is None else max_ssh_port + 10
 

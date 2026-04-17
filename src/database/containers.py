@@ -33,7 +33,7 @@ async def create_new_container(account_id: int):
     new_container = Container(
         id = account_id,
         ssh_port = next_ssh_port,
-        forward_ports = list(range(next_ssh_port + 1, next_ssh_port + 9))
+        forward_ports = list(range(next_ssh_port + 1, next_ssh_port + 10))
     )
 
     # Add the container data to the table

@@ -4,7 +4,8 @@ from sqlmodel import select, delete
 import configuration
 from database.models import Account
 from database.models import Container
-from database.database import session, create_db_and_tables
+from database.database import create_db_and_tables
+import database
 from containers.core import client
 from security.shacrypt512 import shacrypt
 
@@ -12,6 +13,7 @@ from security.shacrypt512 import shacrypt
 async def create_new_container(account_id: int):
     """Creates a new container upon account creation"""
     create_db_and_tables()
+    session = database.session
 
     # Get the account from the ID
     account = session.exec(select(Account).where(Account.id == account_id)).one_or_none()
@@ -89,6 +91,7 @@ async def create_new_container(account_id: int):
 def delete_container(ucinetid: str):
     """Deletes the container associated with the given UCINETID."""
     create_db_and_tables()
+    session = database.session
 
     statement_1 = select(Account.id).where(Account.email == f"{ucinetid}@uci.edu")
     account_id = session.exec(statement_1).one()

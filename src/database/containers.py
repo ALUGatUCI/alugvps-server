@@ -16,20 +16,24 @@ async def create_new_container(account_id: int):
     database.create_db_and_tables()
 
     session = database.session
-    
+
     # Get the account from the ID
     account = session.exec(select(Account).where(Account.id == account_id)).one_or_none()
     if account is None:
         raise ValueError(f"No account found with ID {account_id}")
 
     # Calculate the SSH port forwarding number
+    # We need to make it so that removing or deleting containers will not result in port collision
     statement = select(func.count(Account.id))
     result = database.session.execute(statement).one()[0]
+
+    max_ssh_port = session.execute(select(func.max(Container.ssh_port))).one()[0]
+    next_ssh_port = 10000 if max_ssh_port is None else max_ssh_port + 10
 
     new_container = Container(
         id = account_id,
         ssh_port = 10000 + (10 * result),
-        forward_ports = [port for port in range(10000 + (10 * result) + 1, 10000 + (10 * result) + 10)]
+        forward_ports = list(range(next_ssh_port + 1, next_ssh_port + 9))
     )
 
     # Add the container data to the table
@@ -95,7 +99,6 @@ def get_valid_ports(ucinetid: str):
     account_id = database.session.exec(select(Account.id).where(Account.email == f"{ucinetid}@uci.edu")).one_or_none()
     if account_id is None:
         raise ValueError(f"No account found with ID {account_id}")
-    
+
     return database.session.exec(select(Container.forward_ports).where(Container.id == account_id)).all()[0]
-    
-    
+

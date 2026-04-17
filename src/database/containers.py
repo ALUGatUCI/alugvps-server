@@ -4,7 +4,7 @@ from sqlmodel import select, delete
 import configuration
 from database.models import Account
 from database.models import Container
-import database
+import database.database as database
 from containers.core import client
 from security.shacrypt512 import shacrypt
 

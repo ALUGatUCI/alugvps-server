@@ -50,7 +50,7 @@ async def create_new_container(account_id: int):
         "ephemeral": False,
         "source": {
             'type': 'image',
-            'fingerprint': configuration.read_config_file("fingerprint"),
+            'fingerprint': configuration.read_config_file("fingerprint_image"),
         },
         "config": {
             "limits.cpu": f"{configuration.read_config_file("cpu_limit")}",

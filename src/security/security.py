@@ -59,13 +59,13 @@ def verify_credentials(request: Request):
 def check_confirmation_status(ucinetid: str):
     session = database.session
 
-    statement = select(Account).where(Account.email == f"{ucinetid}@uci.edu")
-    result = session.execute(statement).first()
+    statement = select(Account.confirmed).where(Account.email == f"{ucinetid}@uci.edu")
+    result = session.exec(statement).first()
 
     if result is None:
         return False
 
-    return result.confirmed
+    return result
 
 def discard_token(token: Request):
     discarded_tokens.append(token)

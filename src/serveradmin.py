@@ -5,6 +5,7 @@ import sqlmodel
 from sqlmodel import select, func
 import sys
 import asyncio
+from communications.events import approval_email, not_selected_email
 from database.models import Request, Account
 from database.containers import create_new_container
 from containers.containers import suspend_container_by_ucinetid, unsuspend_container_by_ucinetid, delete_container_by_ucinetid
@@ -33,7 +34,8 @@ async def entry_point():
                 statement = select(func.count()).select_from(Account)
                 result = session.execute(statement).one()[0]
 
-                if result >= int(configuration.read_config_file("acc_limit")):
+                acc_limit = configuration.read_config_file("acc_limit")
+                if acc_limit is not None and result >= int(acc_limit):
                     print("Account limit on server reached")
                     sys.exit(1)
 
@@ -42,6 +44,7 @@ async def entry_point():
                 # Create the container
                 try:
                     await create_new_container(request.id)
+                    await approval_email(request.id)
                 except Exception as e:
                     print(f"Error creating container: {e}")
                     sys.exit(1)
@@ -85,6 +88,7 @@ async def entry_point():
             if arguments[2] == "request":
                 request = session.get(Request, int(arguments[3]))
                 if request is not None:
+                    await not_selected_email(request.id)
                     session.delete(request)
                     session.commit()
                     print(f"Deleted request with ID {arguments[3]}")

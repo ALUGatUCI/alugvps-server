@@ -98,8 +98,8 @@ async def request_container(token: Request, request: ContainerRequest):
     if not check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
 
-    if await get_container_by_ucinetid(ucinetid) is None:
-        raise fastapi.HTTPException(status_code=400, detail="No container found for this account")
+    if await get_container_by_ucinetid(ucinetid) is not None:
+        raise fastapi.HTTPException(status_code=400, detail="User already has a container")
 
     session = database.session
 

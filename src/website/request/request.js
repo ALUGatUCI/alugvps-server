@@ -1,5 +1,5 @@
-window.onload = function() {
-    validateLogin();
+window.onload = async function() {
+    await validateLogin();
 
     const input = document.getElementById('answer');
     input.addEventListener('input', countChars);
@@ -38,9 +38,9 @@ async function submitRequest() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
             },
-            body: JSON.stringify({ 'request_body': answer })
+            body: JSON.stringify({ 'request_body': answer }),
+            credentials: 'include'   // cookie sent automatically
         })
 
         if (request.ok) {

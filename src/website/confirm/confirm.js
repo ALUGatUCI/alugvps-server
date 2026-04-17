@@ -1,5 +1,5 @@
-window.onload = function() {
-    validateLogin();
+window.onload = async function() {
+    await validateLogin();
 
     const codeTextBox = document.getElementById('confirm-code');
     const submitButton = document.getElementById('submit');
@@ -13,8 +13,8 @@ window.onload = function() {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
-            }
+            },
+            credentials: 'include'   // cookie sent automatically
         });
 
         if (response.ok) {

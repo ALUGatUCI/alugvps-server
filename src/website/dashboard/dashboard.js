@@ -1,7 +1,7 @@
 import { savePort, deletePort } from "./portManagement.js";
 
-window.onload = function () {
-    validateLogin();
+window.onload = async function () {
+    await validateLogin();
 
     const startButton = document
         .getElementById("start")
@@ -30,9 +30,7 @@ function setSSHAddress() {
     // Fetch the SSH address on page load
     fetch("/containers/address", {
         method: "GET",
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
+        credentials: 'include'   // cookie sent automatically
     })
         .then((response) => {
             return response.json();
@@ -56,9 +54,7 @@ function setContainerStatus() {
     // Fetch the container status on page load
     fetch("/containers/status", {
         method: "GET",
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
+        credentials: 'include'   // cookie sent automatically
     })
         .then((response) => {
             return response.json();
@@ -81,8 +77,8 @@ function startVPS() {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
+        credentials: 'include'   // cookie sent automatically
     })
         .then((response) => {
             return response.json();
@@ -129,8 +125,8 @@ function rebootVPS() {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
+        credentials: 'include'   // cookie sent automatically
     })
         .then((response) => {
             return response.json();
@@ -155,8 +151,8 @@ function setPortList() {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
+        credentials: 'include'   // cookie sent automatically
     })
         .then((response) => {
             return response.json();
@@ -184,8 +180,8 @@ function setPortList() {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
+        credentials: 'include'   // cookie sent automatically
     })
         .then((response) => {
             return response.json();
@@ -241,7 +237,7 @@ function createPortEntry(portEntry) {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            credentials: 'include'   // cookie sent automatically
         },
     })
         .then((response) => {

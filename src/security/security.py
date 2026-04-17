@@ -4,21 +4,19 @@ from sqlmodel import select
 
 from configuration import configuration
 import jwt
-from fastapi import HTTPException, status, Depends
-import fastapi.security as security
+from fastapi import HTTPException, status, Depends, Request, Cookie
 from fastapi.security import OAuth2PasswordRequestForm
 from jwt import InvalidTokenError
 from pwdlib import PasswordHash
 
 from database import database
-from database.models import Account
+from database.models import Account, Request
 
 SECRET_KEY = configuration.read_config_file("secret_key")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 password_hasher = PasswordHash.recommended()
-oauth2_scheme = security.OAuth2PasswordBearer(tokenUrl="token")
 
 credentials_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
@@ -28,7 +26,14 @@ credentials_exception = HTTPException(
 
 discarded_tokens = []
 
-def verify_credentials(token: Annotated[str, Depends(oauth2_scheme)]):
+def _get_token_from_cookie(request: Request) -> str:
+    token = request.cookies.get("token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    return token
+
+def verify_credentials(request: Request):
+    token = _get_token_from_cookie(request)
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email = payload.get("sub")
@@ -44,7 +49,7 @@ def verify_credentials(token: Annotated[str, Depends(oauth2_scheme)]):
     # Ensure the user isn't banned
     if database.session.exec(select(Account.banned).where(Account.email == email)).first():
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User is banned")
-    
+
     # Ensure the token isn't discord (due to logout)
     if token in discarded_tokens:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Token is discarded")
@@ -59,5 +64,5 @@ def check_confirmation_status(ucinetid: str):
 
     return result.confirmed
 
-def discard_token(token: Annotated[OAuth2PasswordRequestForm, Depends()]):
+def discard_token(token: Request):
     discarded_tokens.append(token)

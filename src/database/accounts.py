@@ -73,7 +73,7 @@ async def add_account_to_database(account: Annotated[OAuth2PasswordRequestForm, 
 
     # Send a confirmation email
     send_confirmation_email(new_account)
-    
+
 
 def perform_login(email: str, password: str):
     """Perform a login and return a token"""
@@ -93,9 +93,9 @@ def perform_login(email: str, password: str):
         )
     else:
         raise exceptions.InvalidPasswordError()
-    
+
     # Check the account is not banned
     if result.banned:
         raise exceptions.AccountBannedError()
 
-    return Token(access_token=access_token, token_type="bearer")
+    return access_token

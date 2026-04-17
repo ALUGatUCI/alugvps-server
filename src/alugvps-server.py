@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 from fastapi.security import OAuth2PasswordRequestForm
@@ -24,7 +24,20 @@ def on_startup():
 
 @app.post("/token")
 def login_with_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
-    return login_to_account(form_data.username, form_data.password)
+    token = login_to_account(form_data.username, form_data.password)
+
+    response = JSONResponse(content={"success": True})
+    response.set_cookie(
+        key="token",
+        value=token,
+        httponly=True,
+        secure=False,
+        samesite="strict",
+        max_age=1800,
+        path="/"
+    )
+
+    return response
 
 # 404 error page
 @app.exception_handler(404)

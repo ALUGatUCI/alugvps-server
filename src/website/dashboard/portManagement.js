@@ -6,11 +6,8 @@ export async function savePort(portName, listen, connect) {
     });
     return fetch(`/containers/port/add?${params}`, {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            'Authorization': `Bearer ${localStorage.getItem("access_token")}`,
-            },
-        })
+        credentials: 'include'   // cookie sent automatically
+    })
         .then((response) => {
             return response.json();
         })
@@ -30,10 +27,7 @@ export async function deletePort(portName) {
     const params = new URLSearchParams({ name: portName });
     return fetch(`/containers/port/delete?${params}`, {
         method: "DELETE",
-        headers: {
-            "Content-Type": "application/json",
-            'Authorization': `Bearer ${localStorage.getItem("access_token")}`,
-        },
+        credentials: 'include'   // cookie sent automatically
     })
         .then((response) => {
             return response.json();

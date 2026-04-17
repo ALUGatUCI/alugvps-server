@@ -1,29 +1,13 @@
-window.onload = function() {
-    validateLogin();
-
-    const accessToken = localStorage.getItem('access_token');
-    if (accessToken) {
-        // Check the token is still valid
-        fetch('/accounts/verify_token', {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    }).then(response => {
-        if (response.status === 200) {
-            // Check if the token is valid by making a request to a protected endpoint
-            redirectToDashboard();
-        } else {
-            localStorage.removeItem('access_token');
-        }
-    }).catch(error => {
-        console.alert(`There was an error validating your token: ${error}`)
-        localStorage.removeItem('access_token');
-    })
-    };
-    loginButton.addEventListener('click', async () => {
-        await login();
-    });
+window.onload = function () {
+  fetch('/accounts/verify_token', {
+      method: 'GET',
+      credentials: 'include'   // cookie sent automatically
+  }).then(response => {
+      if (response.ok) {
+          redirectToDashboard();
+      }
+  });
+  loginButton.addEventListener('click', login);
 }
 
 async function login() {
@@ -36,13 +20,12 @@ async function login() {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: `username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+        body: `username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`,
+        credentials: 'include'
     })
 
     if (data.ok) {
-        const responseData = await data.json();
         // Store the access token in local storage
-        localStorage.setItem('access_token', responseData.access_token);
         alert('Login successful!');
         // Redirect to the dashboard or another page
         redirectToDashboard();

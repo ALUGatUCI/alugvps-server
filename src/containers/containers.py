@@ -9,11 +9,11 @@ from sqlmodel import select
 import containers.responses as responses
 import database.containers as db_containers
 import database.database as database
+from fastapi import Request
 import security
 from containers.body import AddPort, RemovePort
 from containers.core import client
 from database.models import Account, Container
-from security import oauth2_scheme
 
 router = fastapi.APIRouter()
 
@@ -68,7 +68,7 @@ def _get_forward_ports(container: client.containers):
 
 
 @router.get("/exists")
-async def check_container_exists(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
+async def check_container_exists(token: Request):
     """Checks if a container exists for the account"""
     ucinetid = security.verify_credentials(token)  # Verify the credentials (An exception will occur if not valid)
 
@@ -84,9 +84,7 @@ async def check_container_exists(token: Annotated[str, fastapi.Depends(oauth2_sc
 
 
 @router.get("/address", response_model=responses.ContainerAddress)
-async def get_container_connection_port(
-    token: Annotated[str, fastapi.Depends(oauth2_scheme)],
-):
+async def get_container_connection_port(token: Request):
     """Get the address of the account's container"""
     ucinetid = security.verify_credentials(token)  # Verify the credentials (An exception will occur if not valid)
 
@@ -112,7 +110,7 @@ async def get_container_connection_port(
 
 
 @router.get("/status", response_model=responses.ContainerStatus)
-async def container_status(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
+async def container_status(token: Request):
     """Get the status of the current container"""
     ucinetid = security.verify_credentials(token)  # Verify the credentials (An exception will occur if not valid)
 
@@ -136,7 +134,7 @@ async def container_status(token: Annotated[str, fastapi.Depends(oauth2_scheme)]
 
 
 @router.put("/start", response_model=responses.ContainerAction)
-async def container_start(token: Annotated[str, Depends(oauth2_scheme)]):
+async def container_start(token: Request):
     """Start the named container"""
     ucinetid = security.verify_credentials(token)  # Verify the credentials (An exception will occur if not valid)
 
@@ -165,7 +163,7 @@ async def container_start(token: Annotated[str, Depends(oauth2_scheme)]):
 
 
 @router.put("/stop", response_model=responses.ContainerAction)
-async def container_stop(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
+async def container_stop(token: Request):
     """Stop the named container"""
     ucinetid = security.verify_credentials(token)  # Verify the credentials (An exception will occur if not valid)
 
@@ -194,7 +192,7 @@ async def container_stop(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
 
 
 @router.put("/restart", response_model=responses.ContainerAction)
-async def container_restart(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
+async def container_restart(token: Request):
     """Restart the named container"""
     ucinetid = security.verify_credentials(token)  # Verify the credentials (An exception will occur if not valid)
 
@@ -223,10 +221,7 @@ async def container_restart(token: Annotated[str, fastapi.Depends(oauth2_scheme)
 
 
 @router.post("/port/add", response_model=responses.ContainerAction)
-async def add_port(
-    token: Annotated[str, fastapi.Depends(oauth2_scheme)],
-    new_forward: AddPort = Depends(),
-):
+async def add_port(token: Request, new_forward: AddPort = Depends(),):
     """Add forward port to the container"""
 
     ucinetid = security.verify_credentials(token)  # Verify the credentials (An exception will occur if not valid)
@@ -292,7 +287,7 @@ async def add_port(
 
 @router.delete("/port/delete", response_model=responses.ContainerAction)
 async def remove_port(
-    token: Annotated[str, fastapi.Depends(oauth2_scheme)],
+    token: Request,
     remove: RemovePort = Depends(),
 ):
     """Removes a specified port"""
@@ -329,7 +324,7 @@ async def remove_port(
 
 
 @router.get("/port/list", response_model=responses.PortsList)
-async def get_used_port_list(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
+async def get_used_port_list(token: Request):
     """Retrieves a list of all used forwarding ports"""
     ucinetid = security.verify_credentials(token)  # Verify the credentials (An exception will occur if not valid)
 
@@ -350,7 +345,7 @@ async def get_used_port_list(token: Annotated[str, fastapi.Depends(oauth2_scheme
 
 
 @router.get("/port/valid_ports", response_model=responses.ValidPorts)
-async def get_valid_ports(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
+async def get_valid_ports(token: Request):
     """Get all valid ports for this container"""
     ucinetid = security.verify_credentials(token)  # Verify the credentials (An exception will occur if not valid)
 

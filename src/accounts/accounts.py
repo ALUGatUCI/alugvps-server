@@ -4,26 +4,26 @@ from typing import Annotated
 import fastapi
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security.oauth2 import OAuth2
 from database import Container
 from database.accounts import Account, add_account_to_database, perform_login, send_confirmation_email
-from database.models import Request
 import database.database as database
 import database.exceptions as db_exceptions
-from configuration import configuration
 import sqlmodel
 from sqlmodel import select, delete
-from sqlalchemy import func
+from fastapi import Request
+from fastapi.responses import JSONResponse
 from accounts.body import ConfirmationCode, ContainerRequest
 from accounts.responses import AccountConfirmed
 from security import check_confirmation_status, discard_token
 from containers.containers import get_container_by_ucinetid
 
-from security import oauth2_scheme, verify_credentials
+from security import verify_credentials
 
 router = fastapi.APIRouter()
 
 @router.post("/confirm")
-async def confirm_account(token: Annotated[str, fastapi.Depends(oauth2_scheme)], inputted_code: ConfirmationCode = Depends()):
+async def confirm_account(token: Request, inputted_code: ConfirmationCode = Depends()):
     ucinetid = verify_credentials(token)
 
     session = database.session
@@ -47,7 +47,7 @@ async def confirm_account(token: Annotated[str, fastapi.Depends(oauth2_scheme)],
     return fastapi.Response(status_code=201)
 
 @router.get('/resend_code')
-async def resend_code_by_email(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
+async def resend_code_by_email(token: Request):
     ucinetid = verify_credentials(token)
 
     session = database.session
@@ -66,7 +66,7 @@ async def resend_code_by_email(token: Annotated[str, fastapi.Depends(oauth2_sche
     return fastapi.Response(status_code=201)
 
 @router.get('/account_confirmed', response_model=AccountConfirmed)
-async def is_account_confirmed(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
+async def is_account_confirmed(token: Request):
     """Check if the account is confirmed"""
     ucinetid = verify_credentials(token)
 
@@ -81,7 +81,7 @@ async def is_account_confirmed(token: Annotated[str, fastapi.Depends(oauth2_sche
     return AccountConfirmed(confirmed=result.confirmed)
 
 @router.get("/verify_token")
-def verify_token(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
+def verify_token(token: Request):
     """Endpoint for the frontend to verify if a token is valid. Returns 200 if valid, 401 if not."""
     try:
         verify_credentials(token)
@@ -91,7 +91,7 @@ def verify_token(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
         return fastapi.Response(status_code=200)
 
 @router.post("/request_container")
-async def request_container(token: Annotated[str, fastapi.Depends(oauth2_scheme)], request: ContainerRequest):
+async def request_container(token: Request, request: ContainerRequest):
     ucinetid = verify_credentials(token)
 
     if not check_confirmation_status(ucinetid):
@@ -203,20 +203,14 @@ def login_to_account(username, password) -> str:
         raise fastapi.HTTPException(status_code=403, detail=str(e))
 
 @router.post('/logout')
-def logout(token: Annotated[str, Depends(oauth2_scheme)]):
+def logout(token: Request):
     ucinetid = verify_credentials(token)
-
-    session = database.session
-
-    statement = sqlmodel.select(Account).where(Account.email == f"{ucinetid}@uci.edu")
-    result = session.execute(statement).first()[0]
-
-    if result is None:
-        raise fastapi.HTTPException(status_code=400, detail="Account not found")
 
     try:
         discard_token(token)
     except Exception as e:
         raise fastapi.HTTPException(status_code=500, detail=str(e))
 
-    return fastapi.Response(status_code=200)
+    response = JSONResponse(content={"success": True})
+    response.delete_cookie("token", path="/")
+    return response

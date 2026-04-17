@@ -112,7 +112,7 @@ async def request_container(token: Request, request: ContainerRequest):
     if req_len < 300 or req_len > 1000:
         raise fastapi.HTTPException(status_code=400, detail="A minimum of 300 characters is required")
 
-    new_request = Request(id=acc_id, request=request.request_body)
+    new_request = RequestModel(id=acc_id, request=request.request_body)
     session.add(new_request)
     session.commit()
 

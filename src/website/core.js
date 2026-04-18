@@ -77,7 +77,6 @@ async function logoutButtonFunc() {
     if (response.ok) {
       // Clear the cookie client-side
         document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        alert("Logged out successfully");
         window.location.href = 'index.html';
     } else {
         const errorData = await response.json()

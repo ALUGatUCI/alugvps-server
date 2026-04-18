@@ -30,7 +30,7 @@ async def confirm_account(token: Request, inputted_code: ConfirmationCode = Depe
     session = database.session
 
     statement = sqlmodel.select(Account).where(Account.email == f"{ucinetid}@uci.edu")
-    result = session.execute(statement).first()[0]
+    result = session.exec(statement).one_or_none()
 
     if result is None:
         raise fastapi.HTTPException(status_code=400, detail="Account not found")
@@ -54,7 +54,7 @@ async def resend_code_by_email(token: Request):
     session = database.session
 
     statement = sqlmodel.select(Account).where(Account.email == f"{ucinetid}@uci.edu")
-    result = session.execute(statement).first()[0]
+    result = session.exec(statement).one_or_none()
 
     if result is None:
         raise fastapi.HTTPException(status_code=400, detail="Account not found")
@@ -74,7 +74,7 @@ async def is_account_confirmed(token: Request):
     session = database.session
 
     statement = sqlmodel.select(Account).where(Account.email == f"{ucinetid}@uci.edu")
-    result = session.execute(statement).first()[0]
+    result = session.exec(statement).one_or_none()
 
     if result is None:
         raise fastapi.HTTPException(status_code=400, detail="Account not found")

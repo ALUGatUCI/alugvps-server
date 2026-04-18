@@ -4,42 +4,28 @@ export async function savePort(portName, listen, connect) {
         listen: listen,
         connect: connect,
     });
-    return fetch(`/containers/port/add?${params}`, {
+    const response = await fetch(`/containers/port/add?${params}`, {
         method: "POST",
         credentials: 'include'   // cookie sent automatically
-    })
-        .then((response) => {
-            return response.json();
-        })
-        .then((data) => {
-            if (data.success) {
-                alert("The port has successfully be submitted");
-            } else {
-                alert(`An issue occurred submitting the port: ${data.message}`);
-            }
-        })
-        .catch((error) => {
-            alert(`An error occurred trying to submit the port: ${error}`);
-        });
+    });
+    const data = await response.json();
+    if (data.success) {
+        alert("The port has successfully be submitted");
+    } else {
+        alert(`An issue occurred submitting the port: ${data.detail}`);
+    }
 }
 
 export async function deletePort(portName) {
     const params = new URLSearchParams({ name: portName });
-    return fetch(`/containers/port/delete?${params}`, {
+    const response = await fetch(`/containers/port/delete?${params}`, {
         method: "DELETE",
         credentials: 'include'   // cookie sent automatically
-    })
-        .then((response) => {
-            return response.json();
-        })
-        .then((data) => {
-            if (data.success) {
-                alert("The port has successfully be deleted");
-            } else {
-                alert(`An issue occurred deleting the port: ${data.message}`);
-            }
-        })
-        .catch((error) => {
-            alert(`An error occurred trying to delete the port: ${error}`);
-        });
+    });
+    const data = await response.json();
+    if (data.success) {
+        alert("The port has successfully be deleted");
+    } else {
+        alert(`An issue occurred deleting the port: ${data.detail}`);
+    }
 }

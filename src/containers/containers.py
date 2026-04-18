@@ -106,9 +106,9 @@ async def get_container_connection_port(token: Request):
         .join(Account, Container.id == Account.id)
         .where(Account.email == f"{ucinetid}@uci.edu")
     )
-    result = session.exec(statement).first()
+    port = session.exec(statement).first()
 
-    return responses.ContainerAddress(success=True, address=f"{public_ip}:{result}")
+    return responses.ContainerAddress(success=True, address=f"ssh {ucinetid}@{public_ip} -p {port}")
 
 
 @router.get("/status", response_model=responses.ContainerStatus)

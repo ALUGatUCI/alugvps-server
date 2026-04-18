@@ -1,5 +1,4 @@
 import asyncio
-from typing import Annotated
 
 import fastapi
 import httpx

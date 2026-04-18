@@ -4,7 +4,6 @@ from typing import Annotated
 import fastapi
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi.security.oauth2 import OAuth2
 from database import Container
 from database.accounts import Account, add_account_to_database, perform_login, send_confirmation_email
 from database.models import Request as RequestModel

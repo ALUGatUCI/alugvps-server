@@ -1,16 +1,13 @@
-from typing import Annotated
-
 from sqlmodel import select
 
 from configuration import configuration
 import jwt
-from fastapi import HTTPException, status, Depends, Request, Cookie
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import HTTPException, status, Request
 from jwt import InvalidTokenError
 from pwdlib import PasswordHash
 
 from database import database
-from database.models import Account, Request
+from database.models import Account
 
 SECRET_KEY = configuration.read_config_file("secret_key")
 ALGORITHM = "HS256"

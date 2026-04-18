@@ -4,7 +4,7 @@ from pydantic import BaseModel
 import sqlmodel
 import jwt
 from security import SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES, password_hasher as ph, ALGORITHM
-from database.models import AccountCreation, Account
+from database.models import Account
 import database.database as database
 from communications import send_email
 import database.exceptions as exceptions

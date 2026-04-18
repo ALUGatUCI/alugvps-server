@@ -18,7 +18,7 @@ window.onload = async function() {
         });
 
         if (response.ok) {
-            alert("Account successfully confirmed");
+            alert("Your account has been successfully confirmed");
             window.location.reload(); // Reload the page to redirect the user to the next step *sigh*
         } else {
             const errorData = await response.json();

@@ -25,8 +25,6 @@ async function login() {
     })
 
     if (data.ok) {
-        // Store the access token in local storage
-        alert('Login successful!');
         // Redirect to the dashboard or another page
         redirectToDashboard();
     } else {

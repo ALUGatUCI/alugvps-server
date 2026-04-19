@@ -22,7 +22,7 @@ window.onload = function() {
         });
 
         if (response.ok) {
-            alert("Your account is successfully created. Please check your email for a code.");
+            alert("Your account has been successfully created. Please check your email for a code.");
             window.location.href = 'index.html';
         } else {
             const errorData = await response.json();

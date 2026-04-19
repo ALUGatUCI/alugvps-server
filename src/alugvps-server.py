@@ -9,6 +9,7 @@ from containers import router as containers
 from configuration import configuration
 from database import database
 import platform
+import sys
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

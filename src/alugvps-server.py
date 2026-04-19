@@ -22,7 +22,11 @@ app.mount("/website", StaticFiles(directory=os.path.join(BASE_DIR, "website"), h
 
 @app.on_event("startup")
 def on_startup():
-    database.create_db_and_tables()
+    try:
+        database.create_db_and_tables()
+    except Exception as e:
+        print(f"Error creating database tables: {e}")
+        sys.exit(1)
 
 @app.post("/token")
 def login_with_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):

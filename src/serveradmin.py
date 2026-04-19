@@ -6,16 +6,17 @@ from sqlmodel import select, func
 import sys
 import asyncio
 from communications.events import approval_email, not_selected_email
+import database.database as database
+from database.database import create_db_and_tables
 from database.models import Request, Account
 from database.containers import create_new_container
 from containers.containers import suspend_container_by_ucinetid, unsuspend_container_by_ucinetid, delete_container_by_ucinetid
 from configuration import configuration
 
 # Create the database engine and session
-database_path = pathlib.Path.home() / ".alugvps-server" / "alugvps.db"
-engine = sqlmodel.create_engine(f"sqlite:///{database_path}", connect_args={'check_same_thread': False})
-sqlmodel.SQLModel.metadata.create_all(engine)
-session = sqlmodel.Session(engine)
+
+create_db_and_tables()
+session = database.session
 
 # Get the command line arguments
 arguments = sys.argv

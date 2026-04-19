@@ -10,5 +10,4 @@ Server backend software for managing remote Linux LXC containers
 - aiosmtpd
 
 ## Things that must be implemented:
-- Add support for Docker deployment
 - Implement email-based 2FA

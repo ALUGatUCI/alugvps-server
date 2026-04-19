@@ -36,20 +36,29 @@ In the root directory of the source code, run this command:
 
 Once it has been built, initialize a Docker container with the following command:
 
-```docker run \
+```
+docker run \
 --mount type=bind,src={LXD Socket Directory},dst={LXD Socket Directory} \
 --mount type=bind,src={Host .env File Directory},dst=/usr/local/alugvps-server/.env \
 --mount type=bind,src={alugvps.db Database File on Host},dst={/var/lib/alugvps-server/alugvps.db} \
 -p {Listening Port on Host}:{Connection Port in .env File} \
---name {Name Your Set Up} \
-alugvps-server```
+--name {Name Your Container} \
+alugvps-server
+```
 
 The LXD Socket Directory will vary by system, however for Snap installations, it will be located at `/var/snap/lxd/common/lxd/unix.socket`. Otherwise, it will be at `/var/lib/lxd/unix.socket`. So mount whatever the location is in the specified parameters.
 
 To run a container in insecure mode (recommended for testing purposes, run this command):
 
-`docker run -it --mount type=bind,src=/var/snap/lxd/common/lxd/unix.socket,dst=/var/snap/lxd/common/lxd/unix.socket
- --mount type=bind,src=/home/ubuntu/alugvps-server/src/.env,dst=/usr/local/alugvps-server/.env -p 8000:8000 -e ALUGVPS_SECURE_MODE=0 --name alugvps alugvps-ser
-ver`
+```
+docker run \
+--mount type=bind,src={LXD Socket Directory},dst={LXD Socket Directory} \
+--mount type=bind,src={Host .env File Directory},dst=/usr/local/alugvps-server/.env \
+--mount type=bind,src={alugvps.db Database File on Host},dst={/var/lib/alugvps-server/alugvps.db} \
+-p {Listening Port on Host}:{Connection Port in .env File} \
+-e ALUGVPS_SECURE_MODE=0 \
+--name {Name Your Container} \
+alugvps-server
+```
 
 This command follows the same structure, but adds the parameter `-e ALUGVPS_SECURE_MODE=0` to enable insecure mode.

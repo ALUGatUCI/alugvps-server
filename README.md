@@ -36,7 +36,15 @@ In the root directory of the source code, run this command:
 
 Once it has been built, initialize a Docker container with the following command:
 
-`docker run --mount type=bind,src={LXD Socket Directory},dst={LXD Socket Directory} --mount type=bind,src={Host .env File Directory},dst=/usr/local/alugvps-server/.env -p {Listening Port on Host}:{Connection Port in .env File} --name {Name Your Set Up} alugvps-server`
+`
+docker run \
+--mount type=bind,src={LXD Socket Directory},dst={LXD Socket Directory} \
+--mount type=bind,src={Host .env File Directory},dst=/usr/local/alugvps-server/.env \
+--mount type=bind,src={alugvps.db Database File on Host},dst={/var/lib/alugvps-server/alugvps.db} \
+-p {Listening Port on Host}:{Connection Port in .env File} \
+--name {Name Your Set Up} \
+alugvps-server
+`
 
 The LXD Socket Directory will vary by system, however for Snap installations, it will be located at `/var/snap/lxd/common/lxd/unix.socket`. Otherwise, it will be at `/var/lib/lxd/unix.socket`. So mount whatever the location is in the specified parameters.
 

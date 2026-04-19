@@ -15,9 +15,8 @@ Server backend software for managing remote Linux LXC containers
 - Cleaner web user interfance (UI/UX)
 
 ## Setting up a configuration
-You will need a `.env` file to run in the same directory as `alugvps-server.py`. Here is the layout:
+You will need a `.env` file to run in the same directory as `alugvps-server.py`. Here are the environment variables to specify in `.env`:
 
-`
 "secret_key" # Use this command to generate a secret key: openssl rand -hex 32
 "port" # Connection Port
 "acc_limit" # Number of Accounts that can have Containers at a Given Time
@@ -29,7 +28,6 @@ You will need a `.env` file to run in the same directory as `alugvps-server.py`.
 "email_key" # Email key
 "smtp_host" # SMTP Host
 "smtp_port" # SMTP Port
-`
 
 ## Run via Docker
 In the root directory of the source code, run this command:

@@ -1,7 +1,15 @@
 import sqlmodel
 import pathlib
+import os
 
-path = pathlib.Path.home() / ".alugvps-server" / "alugvps.db"
+if os.getuid() != 0:
+    path = pathlib.Path.home() / ".alugvps-server" / "alugvps.db"
+else:
+    path = pathlib.Path("/var/lib/alugvps-server/alugvps.db")
+
+if not path.parent.exists():
+    path.parent.mkdir(parents=True)
+
 engine = sqlmodel.create_engine(f"sqlite:///{path}", connect_args={'check_same_thread': False})
 session = None
 

@@ -11,3 +11,4 @@ Server backend software for managing remote Linux LXC containers
 
 ## Things that must be implemented:
 - Implement email-based 2FA
+- Cleaner web user interfance (UI/UX)

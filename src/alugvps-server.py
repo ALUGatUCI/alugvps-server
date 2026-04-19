@@ -8,13 +8,12 @@ from accounts.accounts import login_to_account, router as accounts
 from containers import router as containers
 from configuration import configuration
 from database import database
-import sys
 import platform
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-secure_mode = "--insecure" not in sys.argv
+secure_mode = os.environ.get("ALUGVPS_SECURE_MODE", "1") != "0"
 
 app = FastAPI()
 

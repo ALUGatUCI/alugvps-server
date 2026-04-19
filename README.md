@@ -5,6 +5,7 @@ Server backend software for managing remote Linux LXC containers
 - Uvicorn
 - FastAPI
 - LXD
+- SQLModel
 - PyJWT
 - python-dotenv
 - aiosmtpd

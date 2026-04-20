@@ -12,7 +12,7 @@ Server backend software for managing remote Linux LXC containers
 
 ## Things that must be implemented:
 - Implement email-based 2FA
-- Cleaner web user interfance (UI/UX)
+- Cleaner web user interface (UI/UX)
 
 ## Setting up a configuration
 You will need a `.env` file to run in the same directory as `alugvps-server.py`. Here are the environment variables to specify in `.env`:

@@ -92,7 +92,7 @@ async def get_container_connection_port(token: Request):
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
 
-    if get_container_by_ucinetid(ucinetid) is None:
+    if await get_container_by_ucinetid(ucinetid) is None:
         raise fastapi.HTTPException(
             status_code=400, detail="No container found for this account"
         )
@@ -332,7 +332,7 @@ async def get_used_port_list(token: Request):
     if not security.check_confirmation_status(ucinetid):
         raise fastapi.HTTPException(status_code=400, detail="Inactive user")
 
-    if get_container_by_ucinetid(ucinetid) is None:
+    if await get_container_by_ucinetid(ucinetid) is None:
         raise fastapi.HTTPException(
             status_code=400, detail="No container found for this account"
         )

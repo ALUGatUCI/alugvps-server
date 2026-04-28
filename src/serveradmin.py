@@ -98,7 +98,10 @@ async def entry_point():
             elif arguments[2] == "users":
                 user = session.get(Account, int(arguments[3]))
                 if user is not None:
-                    await delete_container_by_ucinetid(user.email[:user.email.index("@")]) # Delete the container associated with the user
+                    try:
+                        await delete_container_by_ucinetid(user.email[:user.email.index("@")]) # Delete the container associated with the user
+                    except:
+                        pass
                     session.delete(user)
                     session.commit()
                     print(f"Deleted user with ID {arguments[3]}")
